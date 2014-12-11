@@ -1,5 +1,4 @@
 # Create campaign CSV files
-
 start_time = Time.now
 puts "Starting Script..."
 
@@ -13,6 +12,9 @@ puts "Starting Script..."
 	# Methods:
 		# => outputCompleteCampaign (outputs a CSV file of the complete campaign data ready for importing)
 		# => outputSettingsRow (outputs the settings row for the campaign as ready for campaign import CSV)
+class Campaign
+end
+
 # Class representing an Ad Group (a group of keywords)
 	# Properties:
 		# => Campaign (Campaign object this ad group belongs to)
@@ -21,6 +23,10 @@ puts "Starting Script..."
 		# => Ad Group Status (string - "Enabled")
 	# Methods:
 		# => outputSettingsRow (outputs the settings row for the Ad Group as ready for campaign import CSV)
+
+class AdGroup
+end
+
 # Class representing a Keyword	
 	# Properties:
 		# => Campaign (Campaign object this keyword belongs to)
@@ -31,6 +37,9 @@ puts "Starting Script..."
 		# => Device Preference (string - "All")
 	# Methods:
 		# => outputSettingsRow (outputs the settings row for the Ad Group as ready for campaign import CSV)
+class Keyword
+end
+
 # Class representing an Ad
 	# Properties:
 		# => Campaign (Campaign object this ad belongs to)
@@ -42,6 +51,8 @@ puts "Starting Script..."
 		# => Device Preference (string - "All")
 	# Methods:
 		# => outputSettingsRow (outputs the settings row for the Ad Group as ready for campaign import CSV)
+class Ad
+end
 
 puts "Script Complete!"
 puts "Time elapsed: #{Time.now - start_time} seconds"
