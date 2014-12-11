@@ -39,6 +39,23 @@ class Campaign
 		@networks = opts[:networks]
 		@status = opts[:status]
 		@seeds = opts[:seeds]
+		@output_row_headers = ["Campaign",
+							  "Campaign Daily Budget",
+							  "Languages",
+							  "Networks",
+							  "Ad Group",
+							  "Max CPC",
+							  "Keyword", 
+							  "Type",
+							  "Headline",
+							  "Description Line 1",
+							  "Description Line 2",
+							  "Display URL",
+							  "Destination URL",
+							  "Device Preference",
+							  "Ad Group Status",
+							  "Status"
+							]
 		
 		createAdGroups
 	end
@@ -46,7 +63,37 @@ class Campaign
 	def createAdGroups
 	end
 
+	def outputCompleteCampaignFromSeeds
+
+		CSV.open("campaign_for_import.csv", "wb") do |csv|
+			# Create Headers
+			csv << @output_row_headers
+			csv << outputSettingsRow
+		end
+	end
+
+	# Outputs the settings row as an array
 	def outputSettingsRow
+		output_row = []
+		
+		@output_row_headers.each do |header|
+			case header
+			when "Campaign"
+				output_row << @campaign_name
+			when "Campaign Daily Budget"
+				output_row << @daily_budget
+			when "Languages"
+				output_row << @languages
+			when "Networks"
+				output_row << @networks 
+			when "Status"
+				output_row << @status
+			else
+				output_row << ""
+			end
+		end
+
+		output_row
 	end
 end
 
@@ -62,10 +109,10 @@ end
 class AdGroup
 
 	def initialize( opts={ campaign: nil, keywords: Array[], ads: Array[], ad_group_status: "Enabled"} )
-		campaign = opts[:campaign]
-		keywords = opts[:keywords]
-		ads = opts[:ads]
-		ad_group_status = opts[:ad_group_status]
+		@campaign = opts[:campaign]
+		@keywords = opts[:keywords]
+		@ads = opts[:ads]
+		@ad_group_status = opts[:ad_group_status]
 		
 		createAds
 		createKeywords
@@ -100,12 +147,12 @@ class Keyword
 		 				  keyword: "",
 		 				  type: "Broad",
 		 				  device: "All"} )
-		campaign = opts[:campaign]
-		ad_group = opts[:ad_group]
-		max_cpc = opts[:max_cpc]
-		keyword = opts[:keyword]
-		type = opts[:type]
-		device = opts[:device]
+		@campaign = opts[:campaign]
+		@ad_group = opts[:ad_group]
+		@max_cpc = opts[:max_cpc]
+		@keyword = opts[:keyword]
+		@type = opts[:type]
+		@device = opts[:device]
 	end
 
 	def outputSettingsRow
@@ -133,14 +180,14 @@ class Ad
 						  display_url: "",
 						  destination_url: "",
 						  device_preference: "All"} )
-		campaign = opts[:campaign]
-		ad_group = opts[:ad_group]
-		headline = opts[:headline]
-		desc_line_1 = opts[:desc_line_1]
-		desc_line_2 = opts[:desc_line_2]
-		display_url = opts[:display_url]
-		destination_url = opts[:url]
-		device_preference = opts[:device_preference]
+		@campaign = opts[:campaign]
+		@ad_group = opts[:ad_group]
+		@headline = opts[:headline]
+		@desc_line_1 = opts[:desc_line_1]
+		@desc_line_2 = opts[:desc_line_2]
+		@display_url = opts[:display_url]
+		@destination_url = opts[:url]
+		@device_preference = opts[:device_preference]
 	end
 
 	def outputSettingsRow
@@ -148,6 +195,7 @@ class Ad
 end
 
 campaign = Campaign.new()
+campaign.outputCompleteCampaignFromSeeds
 
 puts "Script Complete!"
 puts "Time elapsed: #{Time.now - start_time} seconds"
