@@ -39,6 +39,7 @@ class Campaign
 		@networks = opts[:networks]
 		@status = opts[:status]
 		@seeds = opts[:seeds]
+		@ad_groups = Array[]
 		@output_row_headers = ["Campaign",
 							  "Campaign Daily Budget",
 							  "Languages",
@@ -56,14 +57,41 @@ class Campaign
 							  "Ad Group Status",
 							  "Status"
 							]
-		
-		createAdGroups
 	end
 
-	def createAdGroup
+	def createAdGroup(name, keywords, ads, ad_group_status)
+		# Create ad group object
+		@ad_groups << AdGroup.new( name: name,
+								   campaign: self, 
+								   keywords: Array[], 
+								   ads: Array[], 
+								   ad_group_status: "Enabled")
 	end
 
-	def outputModifiedBroadCampaignFromSeeds
+	def createModifiedBroadLongTailKeywords
+		Array[]
+	end
+
+	def createModifiedBroadAdGroups
+		# For each keyword in the long tail keywords list, 
+		# create an AdGroup that has 1 ad and 1 keyword
+		keywords = createModifiedBroadLongTailKeywords
+		keywords.each do |keyword|
+			# Put a + before each word to create keyword
+			adgroup_keywords = Array["+cna +classes +online"]
+			# Somehow create ads for the createAdGroup call...
+			createAdGroup(keyword, adgroup_keywords, )
+		end
+	end
+
+	# Turns this campaign into an object represnting a Modified Broad Campaign
+	# similar to the one Andy and I created to start CNA.
+	def createModifiedBroadCampaign
+		createModifiedBroadLongTailKeywords
+		createModifiedBroadAdGroups
+	end
+
+	def outputCampaign
 
 		CSV.open("campaign_for_import.csv", "wb") do |csv|
 			# Create Headers
@@ -107,8 +135,10 @@ end
 		# => outputSettingsRow (outputs the settings row for the Ad Group as ready for campaign import CSV)
 
 class AdGroup
+	attr_accessor :createAds, :createKeywords
 
-	def initialize( opts={ campaign: nil, keywords: Array[], ads: Array[], ad_group_status: "Enabled"} )
+	def initialize( opts={ name: "Default AdGroup Name", campaign: nil, keywords: Array[], ads: Array[], ad_group_status: "Enabled"} )
+		@name = opts[:name]
 		@campaign = opts[:campaign]
 		@keywords = opts[:keywords]
 		@ads = opts[:ads]
