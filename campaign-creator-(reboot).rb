@@ -10,6 +10,8 @@
 start_time = Time.now
 puts "Starting Script..."
 
+require 'csv'
+
 # Class representing a campaign
 	# Properties:
 		# => campaign_name (string - "IP={US}Modbroad, blah blah")
@@ -21,6 +23,7 @@ puts "Starting Script..."
 	# Methods:
 		# => outputCompleteCampaignFromSeeds (outputs a CSV file of the complete campaign data ready for importing)
 		# => outputSettingsRow (outputs the settings row for the campaign as ready for campaign import CSV)
+		# => createAdGroups - creates ad group objects for the campaign based on seed keywords
 class Campaign
 	attr_accessor :campaign_name, :daily_budget, :languages, :networks, :status
 	
@@ -36,7 +39,8 @@ class Campaign
 		@networks = opts[:networks]
 		@status = opts[:status]
 		@seeds = opts[:seeds]
-		# createAdGroups (will create ads and keywords)
+		
+		createAdGroups
 	end
 
 	def createAdGroups
@@ -62,13 +66,16 @@ class AdGroup
 		keywords = opts[:keywords]
 		ads = opts[:ads]
 		ad_group_status = opts[:ad_group_status]
-		# createAds
-		# createKeywords
+		
+		createAds
+		createKeywords
 	end
 
+	# => createAds - creates ad objects for the campaign based on seed keywords
 	def createAds
 	end
 
+	# => createKeywords - creates keyword objects for the campaign based on seed keywords
 	def createKeywords
 	end
 
