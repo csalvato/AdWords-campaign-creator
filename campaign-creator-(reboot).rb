@@ -21,9 +21,9 @@ require 'csv'
 		# => Status (string - "enabled")
 		# => seeds (Array of strings of human readable seed keywords)
 	# Methods:
-		# => outputCompleteCampaignFromSeeds (outputs a CSV file of the complete campaign data ready for importing)
+		# => outputModifiedBroadCampaignFromSeeds (outputs a CSV file of the complete campaign data ready for importing)
 		# => outputSettingsRow (outputs the settings row for the campaign as ready for campaign import CSV)
-		# => createAdGroups - creates ad group objects for the campaign based on seed keywords
+		# => createAdGroup - creates ad group object for the campaign based on seed keywords
 class Campaign
 	attr_accessor :campaign_name, :daily_budget, :languages, :networks, :status
 	
@@ -60,10 +60,10 @@ class Campaign
 		createAdGroups
 	end
 
-	def createAdGroups
+	def createAdGroup
 	end
 
-	def outputCompleteCampaignFromSeeds
+	def outputModifiedBroadCampaignFromSeeds
 
 		CSV.open("campaign_for_import.csv", "wb") do |csv|
 			# Create Headers
