@@ -52,7 +52,7 @@ class Campaign
 						  location: "United States",
 						  networks: "Google Search;Search Partners", 
 						  status: "Paused",
-						  sitelinks: []
+						  sitelinks: [],
 						  adgroups: []})
 		@campaign_name = opts[:campaign_name]
 		@daily_budget = opts[:daily_budget]
@@ -122,23 +122,23 @@ class Campaign
 		end
 	end
 
-	def outputCampaign
+	def outputCampaign(output_filename)
 
-		CSV.open("campaign_for_import.csv", "wb") do |csv|
+		CSV.open(output_filename, "wb") do |csv|
 			# Create Headers
 			csv << @output_row_headers
 			# Output Campaign Settings Row
-			csv << outputSettingsRow
+			# csv << outputSettingsRow
 
 			# Output All AdGroups Settings Rows
-			@adgroups.each do |adgroup|
-				csv << adgroup.outputAdGroup
-			end
+			# @adgroups.each do |adgroup|
+			# 	csv << adgroup.outputAdGroup
+			# end
 
-			# Output All Sitelinks Settings Rows
-			@sitelinks.each do |sitelink|
-				csv << sitelink.outputSitelink
-			end
+			# # Output All Sitelinks Settings Rows
+			# @sitelinks.each do |sitelink|
+			# 	csv << sitelink.outputSitelink
+			# end
 
 		end
 	end
