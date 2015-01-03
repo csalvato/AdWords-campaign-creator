@@ -18,10 +18,15 @@ class CampaignFactory
 	def initialize(opts={})
 	end
 
-	def createModifiedBroadCampaign(seedString)
-		def createModifiedBroadLongTailKeywords
-			Campaign.new()
-		end
+	def createModifiedBroadCityStateCampaign(seed, niche, landingPage, areaOfStudy, concentration)
+		# Create Campaign with settings for seed
+		campaign = Campaign.new()
+
+		# Create AdGroups for campaign(campaign.createAdGroup)
+			# Create Ads for AdGroup
+			# Create Keywords for AdGroup
+
+		return campaign
 	end
 
 end
@@ -46,15 +51,15 @@ class Campaign
 						  languages: "en", 
 						  location: "United States",
 						  networks: "Google Search;Search Partners", 
-						  status: "Paused", 
-						  seeds: []})
+						  status: "Paused",
+						  sitelinks: []
+						  adgroups: []})
 		@campaign_name = opts[:campaign_name]
 		@daily_budget = opts[:daily_budget]
 		@languages = opts[:languages]
 		@location = opts[:location]
 		@networks = opts[:networks]
 		@status = opts[:status]
-		@seeds = opts[:seeds]
 		@ad_groups = Array[]
 		@sitelinks = Array[]
 		@output_row_headers = ["Campaign",
@@ -66,6 +71,7 @@ class Campaign
 							  "Max CPC",
 							  "Keyword", 
 							  "Type",
+							  "Sitelink Text",
 							  "Headline",
 							  "Description Line 1",
 							  "Description Line 2",
@@ -96,13 +102,6 @@ class Campaign
 			# Somehow create ads for the createAdGroup call...
 			createAdGroup(keyword, adgroup_keywords, )
 		end
-	end
-
-	# Turns this campaign into an object represnting a Modified Broad Campaign
-	# similar to the one Andy and I created to start CNA.
-	def createModifiedBroadCampaign
-		createModifiedBroadLongTailKeywords
-		createModifiedBroadAdGroups
 	end
 
 	def outputCampaign
@@ -250,8 +249,22 @@ class Ad
 	end
 end
 
-campaign = Campaign.new()
-campaign.outputCompleteCampaignFromSeeds
+#Create Campaign Factory to help with campaign creation
+campaignFactory = CampaignFactory.new()
+
+#Set Niche Parameters
+seed = "human resources certification"
+niche = "Human Resources"
+landingPage = "human-resources0"
+areaOfStudy = "6B5B6155"
+concentration = "01855C0C"
+
+#Create Mod Broad City-State Campaign using Niche Parameters
+campaign = campaignFactory.createModifiedBroadCityStateCampaign(seed, niche, landingPage, areaOfStudy, concentration)
+
+#Output the campaign as a CSV
+output_filename = "campaign-for-import.csv"
+campaign.outputCampaign(output_filename)
 
 puts "Script Complete!"
 puts "Time elapsed: #{Time.now - start_time} seconds"
