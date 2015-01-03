@@ -25,25 +25,29 @@ require 'csv'
 		# => outputSettingsRow (outputs the settings row for the campaign as ready for campaign import CSV)
 		# => createAdGroup - creates ad group object for the campaign based on seed keywords
 class Campaign
-	attr_accessor :campaign_name, :daily_budget, :languages, :networks, :status
+	attr_accessor :campaign_name, :daily_budget, :languages, :location, :networks, :status, :sitelinks
 	
 	def initialize(opts={ campaign_name: "Default Name", 
 						  daily_budget: 10.00, 
 						  languages: "en", 
-						  networks: "Google Search", 
+						  location: "United States",
+						  networks: "Google Search;Search Partners", 
 						  status: "Paused", 
 						  seeds: []})
 		@campaign_name = opts[:campaign_name]
 		@daily_budget = opts[:daily_budget]
 		@languages = opts[:languages]
+		@location = opts[:location]
 		@networks = opts[:networks]
 		@status = opts[:status]
 		@seeds = opts[:seeds]
 		@ad_groups = Array[]
+		@sitelinks = Array[]
 		@output_row_headers = ["Campaign",
 							  "Campaign Daily Budget",
 							  "Languages",
 							  "Networks",
+							  "Location",
 							  "Ad Group",
 							  "Max CPC",
 							  "Keyword", 
@@ -66,10 +70,6 @@ class Campaign
 								   keywords: Array[], 
 								   ads: Array[], 
 								   ad_group_status: "Enabled")
-	end
-
-	def createModifiedBroadLongTailKeywords
-		Array[]
 	end
 
 	def createModifiedBroadAdGroups
@@ -96,7 +96,19 @@ class Campaign
 		CSV.open("campaign_for_import.csv", "wb") do |csv|
 			# Create Headers
 			csv << @output_row_headers
+			# Output Campaign Settings Row
 			csv << outputSettingsRow
+
+			# Output All AdGroups Settings Rows
+			@adgroups.each do |adgroup|
+				csv << adgroup.outputAdGroup
+			end
+
+			# Output All Sitelinks Settings Rows
+			@sitelinks.each do |sitelink|
+				csv << sitelink.outputSitelink
+			end
+
 		end
 	end
 
