@@ -12,6 +12,20 @@ puts "Starting Script..."
 
 require 'csv'
 
+# Class representing a "Campaign Factory" that can make different kinds of campaigns
+class CampaignFactory
+
+	def initialize(opts={})
+	end
+
+	def createModifiedBroadCampaign(seedString)
+		def createModifiedBroadLongTailKeywords
+			Campaign.new()
+		end
+	end
+
+end
+
 # Class representing a campaign
 	# Properties:
 		# => campaign_name (string - "IP={US}Modbroad, blah blah")
