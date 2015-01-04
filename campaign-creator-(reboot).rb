@@ -19,15 +19,16 @@ class CampaignFactory
 	end
 
 	def createModifiedBroadCityStateCampaign(seed, niche, landingPage, areaOfStudy, concentration)
-		campaign = Campaign.new( campaign_name: "IP=US [#{niche}] {#{seed} +SUBLOCATION +LOCATIONCODE} (search; modbroad)" )
+		campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION +LOCATIONCODE} (search; modbroad)"
+		campaign = Campaign.new( name: campaign_name )
 
-		# Create AdGroups for campaign(campaign.createAdGroup)
-			# Create Ads for AdGroup
-			# Create Keywords for AdGroup
+		ad_group_name = seed + " in " + "City" + " " + "State"
+		keywords = [ "+" + seed.gsub(" ", " +")]
+
+		adgroup = campaign.createAdGroup(ad_group_name)
 
 		return campaign
 	end
-
 end
 
 # Class representing a campaign
@@ -43,8 +44,10 @@ end
 		# => outputSettingsRow (outputs the settings row for the campaign as ready for campaign import CSV)
 		# => createAdGroup - creates ad group object for the campaign based on seed keywords
 class Campaign
+	attr_accessor :output_row_headers, :status, :name
+
 	def initialize(opts={})
-		opts = {campaign_name: "Default Name",
+		opts = {name: "Default Name",
 				daily_budget: "10",
 				networks: "Search Partners",
 				languages: "en",
@@ -60,7 +63,7 @@ class Campaign
 				status: "Active",
 				sitelinks: [],
 				adgroups: [] }.merge(opts)
-		@campaign_name = opts[:campaign_name]
+		@name = opts[:name]
 		@daily_budget = opts[:daily_budget]
 		@networks = opts[:networks]
 		@languages = opts[:languages]
@@ -116,25 +119,10 @@ class Campaign
 								"Status"]
 	end
 
-	def createAdGroup(name, keywords, ads, ad_group_status)
+	def createAdGroup(name)
 		# Create ad group object
-		@ad_groups << AdGroup.new( name: name,
-								   campaign: self, 
-								   keywords: Array[], 
-								   ads: Array[], 
-								   ad_group_status: "Enabled")
-	end
-
-	def createModifiedBroadAdGroups
-		# For each keyword in the long tail keywords list, 
-		# create an AdGroup that has 1 ad and 1 keyword
-		keywords = createModifiedBroadLongTailKeywords
-		keywords.each do |keyword|
-			# Put a + before each word to create keyword
-			adgroup_keywords = Array["+cna +classes +online"]
-			# Somehow create ads for the createAdGroup call...
-			createAdGroup(keyword, adgroup_keywords, )
-		end
+		@adgroups << AdGroup.new( name: name, 
+								  campaign: self)
 	end
 
 	def outputCampaign(output_filename)
@@ -143,12 +131,12 @@ class Campaign
 			# Create Headers
 			csv << @output_row_headers
 			# Output Campaign Settings Row
-			csv << outputSettingsRow
+			csv << self.settingsRow
 
 			# Output All AdGroups Settings Rows
-			# @adgroups.each do |adgroup|
-			# 	csv << adgroup.outputAdGroup
-			# end
+			@adgroups.each do |adgroup|
+			 	csv << adgroup.settingsRow
+			end
 
 			# # Output All Sitelinks Settings Rows
 			# @sitelinks.each do |sitelink|
@@ -159,13 +147,13 @@ class Campaign
 	end
 
 	# Outputs the settings row as an array
-	def outputSettingsRow
+	def settingsRow
 		output_row = []
 		
 		@output_row_headers.each do |header|
 			case header
 			when "Campaign"
-				output_row << @campaign_name
+				output_row << @name
 			when "Campaign Daily Budget"
 				output_row << @daily_budget
 			when "Languages"
@@ -211,28 +199,57 @@ end
 		# => outputSettingsRow (outputs the settings row for the Ad Group as ready for campaign import CSV)
 
 class AdGroup
-	attr_accessor :createAds, :createKeywords
+	def initialize( opts={} )
+		opts = { campaign: nil, 
+				 name: "Default AdGroup Name", 
+				 keywords: Array[], 
+				 ads: Array[], 
+				 ad_group_status: "Active"}.merge(opts)
 
-	def initialize( opts={ name: "Default AdGroup Name", campaign: nil, keywords: Array[], ads: Array[], ad_group_status: "Enabled"} )
-		@name = opts[:name]
 		@campaign = opts[:campaign]
+		@name = opts[:name]
 		@keywords = opts[:keywords]
 		@ads = opts[:ads]
 		@ad_group_status = opts[:ad_group_status]
-		
-		createAds
-		createKeywords
 	end
 
 	# => createAds - creates ad objects for the campaign based on seed keywords
 	def createAds
 	end
 
-	# => createKeywords - creates keyword objects for the campaign based on seed keywords
-	def createKeywords
-	end
+	def settingsRow
+		output_row = []
+		
+		@campaign.output_row_headers.each do |header|
+			case header
+			when "Campaign"
+				output_row << @campaign.name
+			when "Ad Group"
+				output_row << @name
+			when "Max CPC"
+				output_row << "0.01"
+			when "Display Network Max CPC"
+				output_row << "0"
+			when "Max CPM"
+				output_row << "0.25"
+			when "CPA Bid"
+				output_row << "0.01"
+			when "Display Network Custom Bid Type"
+				output_row << "None"
+			when "Ad Group Type"
+				output_row << "Default"
+			when "Flexible Reach"
+				output_row << "Interests and remarketing"
+			when "Campaign Status"
+				output_row << @campaign.status
+			when "AdGroup Status"
+				output_row << @ad_group_status
+			else
+				output_row << ""
+			end
+		end
 
-	def outputSettingsRow
+		output_row
 	end
 end
 
@@ -261,7 +278,7 @@ class Keyword
 		@device = opts[:device]
 	end
 
-	def outputSettingsRow
+	def settingsRow
 	end
 end
 
@@ -296,7 +313,7 @@ class Ad
 		@device_preference = opts[:device_preference]
 	end
 
-	def outputSettingsRow
+	def settingsRow
 	end
 end
 
