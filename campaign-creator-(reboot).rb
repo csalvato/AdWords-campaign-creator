@@ -19,7 +19,7 @@ class CampaignFactory
 	end
 
 	def createModifiedBroadCityStateCampaign(seed, niche, landingPage, areaOfStudy, concentration)
-		campaign = Campaign.new()
+		campaign = Campaign.new( campaign_name: "IP=US [#{niche}] {#{seed} +SUBLOCATION +LOCATIONCODE} (search; modbroad)" )
 
 		# Create AdGroups for campaign(campaign.createAdGroup)
 			# Create Ads for AdGroup
@@ -43,31 +43,40 @@ end
 		# => outputSettingsRow (outputs the settings row for the campaign as ready for campaign import CSV)
 		# => createAdGroup - creates ad group object for the campaign based on seed keywords
 class Campaign
-	attr_accessor :campaign_name, :daily_budget, :languages, :location, :networks, :status, :sitelinks
-
-	def initialize(opts={ 	daily_budget: "10",
-							networks: "Search Partners",
-							languages: "en",
-							big_strategy_type: "Manual CPC",
-							enhanced_cpc: "Disabled",
-							viewable_cpm: "Disabled",
-							bid_adjustment: "-100",
-							start_date: Time.now.strftime("%m-%d-%Y"),
-							end_date: "[]",
-							ad_schedule: "[]",
-							location: "United States",
-							campaign_status: "Active",
-							status: "Active",
-							sitelinks: [],
-							adgroups: [] })
+	def initialize(opts={})
+		opts = {campaign_name: "Default Name",
+				daily_budget: "10",
+				networks: "Search Partners",
+				languages: "en",
+				bid_strategy_type: "Manual CPC",
+				enhanced_cpc: "Disabled",
+				viewable_cpm: "Disabled",
+				bid_adjustment: "-100",
+				start_date: Time.now.strftime("%m-%d-%Y"),
+				end_date: "[]",
+				ad_schedule: "[]",
+				location: "United States",
+				campaign_status: "Active",
+				status: "Active",
+				sitelinks: [],
+				adgroups: [] }.merge(opts)
 		@campaign_name = opts[:campaign_name]
 		@daily_budget = opts[:daily_budget]
-		@languages = opts[:languages]
-		@location = opts[:location]
 		@networks = opts[:networks]
+		@languages = opts[:languages]
+		@bid_strategy_type = opts[:bid_strategy_type]
+		@enhanced_cpc = opts[:enhanced_cpc]
+		@viewable_cpm = opts[:viewable_cpm]
+		@bid_adjustment = opts[:bid_adjustment]
+		@start_date = opts[:start_date]
+		@end_date = opts[:end_date]
+		@ad_schedule = opts[:ad_schedule]
+		@location = opts[:location]
+		@campaign_status = opts[:campaign_status]
 		@status = opts[:status]
-		@ad_groups = Array[]
-		@sitelinks = Array[]
+		@sitelinks = opts[:sitelinks]
+		@adgroups = opts[:adgroups]
+
 		@output_row_headers = [ "Campaign",
 								"Campaign Daily Budget",
 								"Campaign Type",
@@ -165,6 +174,24 @@ class Campaign
 				output_row << @networks 
 			when "Status"
 				output_row << @status
+			when "Bid Strategy Type"
+				output_row << @bid_strategy_type				
+			when "Enhanced CPC"
+				output_row << @enhanced_cpc
+			when "Viewable CPM"
+				output_row << @viewable_cpm
+			when "Bid Adjustment"
+				output_row << @bid_adjustment
+			when "Start Date"
+				output_row << @start_date
+			when "End Date"
+				output_row << @end_date
+			when "Ad Schedule"
+				output_row << @ad_schedule
+			when "Location"
+				output_row << @location
+			when "Campaign Status"
+				output_row << @campaign_status
 			else
 				output_row << ""
 			end
@@ -277,7 +304,7 @@ end
 campaignFactory = CampaignFactory.new()
 
 #Set Niche Parameters
-seed = "human resources certification"
+seed = "Human Resources Certification"
 niche = "Human Resources"
 landingPage = "human-resources0"
 areaOfStudy = "6B5B6155"
