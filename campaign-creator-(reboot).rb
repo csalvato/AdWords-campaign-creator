@@ -19,7 +19,6 @@ class CampaignFactory
 	end
 
 	def createModifiedBroadCityStateCampaign(seed, niche, landingPage, areaOfStudy, concentration)
-		# Create Campaign with settings for seed
 		campaign = Campaign.new()
 
 		# Create AdGroups for campaign(campaign.createAdGroup)
@@ -45,15 +44,22 @@ end
 		# => createAdGroup - creates ad group object for the campaign based on seed keywords
 class Campaign
 	attr_accessor :campaign_name, :daily_budget, :languages, :location, :networks, :status, :sitelinks
-	
-	def initialize(opts={ campaign_name: "Default Name", 
-						  daily_budget: 10.00, 
-						  languages: "en", 
-						  location: "United States",
-						  networks: "Google Search;Search Partners", 
-						  status: "Paused",
-						  sitelinks: [],
-						  adgroups: []})
+
+	def initialize(opts={ 	daily_budget: "10",
+							networks: "Search Partners",
+							languages: "en",
+							big_strategy_type: "Manual CPC",
+							enhanced_cpc: "Disabled",
+							viewable_cpm: "Disabled",
+							bid_adjustment: "-100",
+							start_date: Time.now.strftime("%m-%d-%Y"),
+							end_date: "[]",
+							ad_schedule: "[]",
+							location: "United States",
+							campaign_status: "Active",
+							status: "Active",
+							sitelinks: [],
+							adgroups: [] })
 		@campaign_name = opts[:campaign_name]
 		@daily_budget = opts[:daily_budget]
 		@languages = opts[:languages]
@@ -128,7 +134,7 @@ class Campaign
 			# Create Headers
 			csv << @output_row_headers
 			# Output Campaign Settings Row
-			# csv << outputSettingsRow
+			csv << outputSettingsRow
 
 			# Output All AdGroups Settings Rows
 			# @adgroups.each do |adgroup|
