@@ -18,7 +18,7 @@ class CampaignFactory
 	def initialize(opts={})
 	end
 
-	def createModifiedBroadCityStateCampaign(seed, short_seed, niche, landingPage, areaOfStudy, concentration)
+	def createModifiedBroadCityStateCampaign(seed, short_seed, niche, landingPage, area_of_study, concentration)
 		campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION +LOCATIONCODE} (search; modbroad)"
 		campaign = Campaign.new( name: campaign_name )
 
@@ -26,35 +26,29 @@ class CampaignFactory
 		city = "City"
 		state_name = "State"
 		state_code = "ST"
-		area_of_study = "75346615"
-		concentration = "AB6EE9D4"
 		location = state_name
 		sublocation = city
 		locationcode = state_code
-		headline = seed + " " + city + " " + state_code
-		desc_line_1  = city + " " + seed + " " + state_code
-		desc_line_2  = "Find " + state_name + " " + seed
-		display_url = seed.gsub(" ","-") + ".koodlu.com/" + state_code
-		page_headline = "Looking for " + seed + " in " + city + ", " + state_code
+		page_headline = "Looking for " + seed + " in " + city + ", " + state_code + "?"
 		sitelink_utm_campaign = "_src*adwords_d*{ifmobile:mb}{ifnotmobile:dt}_k*{keyword}_m*{matchtype}_c*{creative}_p*{adposition}_n*{network}"
 		sitelink_destination_url = "http://koodlu.com/#{landingPage}/" +
 									"?area_of_study=#{area_of_study}" + 
 									"&concentration=#{concentration}" +
 									"&seed=#{seed.gsub(" ", "%20")}" +
-									"&headline=#{headline.gsub(" ","%20")}" +
+									"&headline=#{page_headline.gsub(" ","%20").gsub("?","%3f")}" +
 									"&utm_campaign=#{sitelink_utm_campaign}" +
 									"&utm_source=Google" +
 									"&utm_medium=cpc"
 
-		createCityStateSitelink1(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
-		createCityStateSitelink2(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
-		createCityStateSitelink3(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
-		createCityStateSitelink4(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		createCityStateSitelink1(campaign, niche, seed, short_seed, sitelink_destination_url)
+		createCityStateSitelink2(campaign, niche, seed, short_seed, sitelink_destination_url)
+		createCityStateSitelink3(campaign, niche, seed, short_seed, sitelink_destination_url)
+		createCityStateSitelink4(campaign, niche, seed, short_seed, sitelink_destination_url)
 
 		ad_group_name = seed + " in " + city + " " + state_code
 		adgroup = campaign.createAdGroup(ad_group_name)
 
-		keywordString = "+" + seed.gsub(" ", " +")
+		keywordString = "+" + (seed + city + state_code).gsub(" ", " +")
 		adgroup.createKeyword(keywordString)
 
 
@@ -77,7 +71,7 @@ class CampaignFactory
 							  "&utm_campaign=#{utm_campaign}" + 
 							  "&utm_source=Google" + 
 							  "&utm_medium=cpc"
-			createCityStateAd(adgroup, headline, desc_line_1, desc_line_2, display_url, destination_url, device_preference)
+			createCityStateAd(adgroup, niche, seed, short_seed, city, state_name, state_code, destination_url, device_preference)
 		end
 
 		return campaign
@@ -93,11 +87,64 @@ class CampaignFactory
 		return "ERROR: None Under " + max_length.to_s + " Characters!"
 	end
 
-	def createCityStateAd(adgroup, headline, desc_line_1, desc_line_2, display_url, destination_url, device_preference)
+	def createCityStateAd(adgroup, niche, seed, short_seed, city, state_name, state_code, destination_url, device_preference)
+		headline_options = [seed + " " + city + " " + state_code,
+							seed + " " + city,
+							seed + " " + state_name,
+							seed + " " + state_code,
+							seed,
+							short_seed + " " + city + " " + state_code,
+							short_seed + " " + city,
+							short_seed + " " + state_name,
+							short_seed + " " + state_code,
+							short_seed]
+		headline = selectOptionOfLength( headline_options, 25 )
+		
+		desc_line_1_options = [city + " " + seed + " " + state_name + "?",
+							   city + " " + seed + " " + state_code + "?",
+							   city + " " + seed + "?",
+							   state_name + " " + seed + "?",
+							   state_code + " " + seed + "?",
+							   seed + "?",
+							   city + " " + short_seed + " " + state_name + "?",
+							   city + " " + short_seed + " " + state_code + "?",
+							   city + " " + short_seed + "?",
+							   state_name + " " + short_seed + "?",
+							   state_code + " " + short_seed + "?",
+							   short_seed + "?",]
+		desc_line_1 = selectOptionOfLength( desc_line_1_options, 35 )
+
+		desc_line_2_options  = ["Find " + city + " " + seed,
+								"Find " + state_name + " " + seed,
+							    "Find " + state_code + " " + seed,
+								"Find " + seed,
+								seed,
+								"Find " + city + " " + short_seed,
+								"Find " + state_name + " " + short_seed,
+							    "Find " + state_code + " " + short_seed,
+								"Find " + short_seed,
+								short_seed]
+		desc_line_2 = selectOptionOfLength( desc_line_2_options, 35 )
+
+
+		display_url_options = [ seed.gsub(" ","-") + ".koodlu.com/" + city,
+								seed.gsub(" ","-") + ".koodlu.com/" + state_name,
+								seed.gsub(" ","-") + ".koodlu.com/" + state_code,
+								seed.gsub(" ","-") + ".koodlu.com",
+								niche.gsub(" ","-") + ".koodlu.com/" + city,
+								niche.gsub(" ","-") + ".koodlu.com/" + state_name,
+								niche.gsub(" ","-") + ".koodlu.com/" + state_code,
+								niche.gsub(" ","-") + ".koodlu.com",
+								short_seed.gsub(" ","-") + ".koodlu.com/" + city,
+								short_seed.gsub(" ","-") + ".koodlu.com/" + state_name,
+								short_seed.gsub(" ","-") + ".koodlu.com/" + state_code,
+								short_seed.gsub(" ","-") + ".koodlu.com",]
+		display_url = selectOptionOfLength( display_url_options, 35 )
+
 		adgroup.createAd(headline, desc_line_1, desc_line_2, display_url, destination_url, device_preference)
 	end
 
-	def createCityStateSitelink1(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+	def createCityStateSitelink1(campaign, niche, seed, short_seed, sitelink_destination_url)
 		sitelink_link_text_options = ["Find " + seed + " Near You",
 							  		  seed + " Near You",
 							          "Find " + seed,
@@ -133,7 +180,7 @@ class CampaignFactory
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
 
-	def createCityStateSitelink2(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+	def createCityStateSitelink2(campaign, niche, seed, short_seed, sitelink_destination_url)
 		sitelink_link_text_options = ["Quick " + seed + " Finder",
 							  		  seed + " Finder",
 							  		  "Quick" + short_seed + " Finder",
@@ -163,7 +210,7 @@ class CampaignFactory
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
 
-	def createCityStateSitelink3(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+	def createCityStateSitelink3(campaign, niche, seed, short_seed, sitelink_destination_url)
 		sitelink_link_text_options = ["Submit Your Info Online"]
   	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, 25 )
 		
@@ -183,7 +230,7 @@ class CampaignFactory
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
 
-	def createCityStateSitelink4(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+	def createCityStateSitelink4(campaign, niche, seed, short_seed, sitelink_destination_url)
 		sitelink_link_text_options = ["Takes Less Than 1 Min"]
   	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, 25 )
 		
