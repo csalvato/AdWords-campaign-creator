@@ -18,7 +18,7 @@ class CampaignFactory
 	def initialize(opts={})
 	end
 
-	def createModifiedBroadCityStateCampaign(seed, niche, landingPage, areaOfStudy, concentration)
+	def createModifiedBroadCityStateCampaign(seed, short_seed, niche, landingPage, areaOfStudy, concentration)
 		campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION +LOCATIONCODE} (search; modbroad)"
 		campaign = Campaign.new( name: campaign_name )
 
@@ -46,10 +46,10 @@ class CampaignFactory
 									"&utm_source=Google" +
 									"&utm_medium=cpc"
 
-		createCityStateSitelink1(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
-		createCityStateSitelink2(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
-		createCityStateSitelink3(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
-		createCityStateSitelink4(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		createCityStateSitelink1(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		createCityStateSitelink2(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		createCityStateSitelink3(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		createCityStateSitelink4(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
 
 		ad_group_name = seed + " in " + city + " " + state_code
 		adgroup = campaign.createAdGroup(ad_group_name)
@@ -60,7 +60,11 @@ class CampaignFactory
 
 		device_preferences = ["All", "Mobile"]
 		device_preferences.each do |device_preference|
-			device_code = "mb" if device_preference == "Mobile"
+			if device_preference == "Mobile"
+				device_code = "mb" 			
+			else
+				device_code = "dt"
+			end
 			utm_campaign = "_src*adwords_d*{ifmobile:mb}{ifnotmobile:dt}_d2*#{device_code}_k*{keyword}_m*{matchtype}_c*{creative}_p*{adposition}_n*{network}"
 			destination_url = "http://koodlu.com/#{landingPage}/" +
 							  "?area_of_study=#{area_of_study}" +
@@ -73,7 +77,7 @@ class CampaignFactory
 							  "&utm_campaign=#{utm_campaign}" + 
 							  "&utm_source=Google" + 
 							  "&utm_medium=cpc"
-			adgroup.createAd(headline, desc_line_1, desc_line_2, display_url, destination_url, device_preference)
+			createCityStateAd(adgroup, headline, desc_line_1, desc_line_2, display_url, destination_url, device_preference)
 		end
 
 		return campaign
@@ -86,14 +90,22 @@ class CampaignFactory
 			end 
 		end
 
-		return "ERROR: None Under " + max_length + " Characters!"
+		return "ERROR: None Under " + max_length.to_s + " Characters!"
 	end
 
-	def createCityStateSitelink1(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+	def createCityStateAd(adgroup, headline, desc_line_1, desc_line_2, display_url, destination_url, device_preference)
+		adgroup.createAd(headline, desc_line_1, desc_line_2, display_url, destination_url, device_preference)
+	end
+
+	def createCityStateSitelink1(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
 		sitelink_link_text_options = ["Find " + seed + " Near You",
 							  		  seed + " Near You",
 							          "Find " + seed,
 							      	  seed,
+							      	  "Find " + short_seed + " Near You",
+							  		  short_seed + " Near You",
+							          "Find " + short_seed,
+							      	  short_seed,
 							      	  "Find " + niche + " Training",
 							      	  niche + " Training"]
   	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, 25 )
@@ -101,13 +113,18 @@ class CampaignFactory
 		sitelink_desc_line_1_options = ["Looking for " + seed + "?",
 										"Need " + seed + "?",
 										seed + "?",
+										"Looking for " + short_seed + "?",
+										"Need " + short_seed + "?",
+										short_seed + "?",
 										"Looking for " + niche + "Classes?",
 										"Need " + niche + "?",
 										niche + " Classes?"]
 		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, 35 )
 
 		sitelink_desc_line_2_options = ["Find " + seed + " Now",
+										"Find " + short_seed + " Now",
 										seed + " Now",
+										short_seed + " Now",
 										niche + " Training Now",
 										"Quick Training Finder"]
 		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, 35 )
@@ -116,26 +133,78 @@ class CampaignFactory
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
 
-	def createCityStateSitelink2(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
-		sitelink_link_text = "Quick " + seed + " Finder"
-		sitelink_desc_line_1 = "Use our " + seed + " Finder"
-		sitelink_desc_line_2 = "To Find " + seed + " Now"
+	def createCityStateSitelink2(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		sitelink_link_text_options = ["Quick " + seed + " Finder",
+							  		  seed + " Finder",
+							  		  "Quick" + short_seed + " Finder",
+							          niche + " Classes Finder",
+							      	  seed,
+							      	  short_seed + " Finder"]
+  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, 25 )
+		
+		sitelink_desc_line_1_options = ["Use our " + seed + " Finder",
+										"Use " + seed + " Finder",
+										"Use our " + short_seed + " Finder",
+										"Use " + short_seed + " Finder",
+										"Use " + niche + " Classes Finder",
+										"Use Our Classes Finder"]
+		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, 35 )
+
+		sitelink_desc_line_2_options = ["To Find " + seed + " Now",
+										"To Find " + seed,
+										"To Find " + short_seed + " Now",
+										"To Find " + seed,
+										"To Find " + niche + " Classes Now",
+										"To Find " + niche + " Classes",
+										"To Find Classes Now"]
+		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, 35 )
+
 		url = sitelink_destination_url + "&sitelink-test=#{sitelink_link_text.gsub(" ","-")}"
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
 
-	def createCityStateSitelink3(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
-		sitelink_link_text = "Submit Your Info Online"
-		sitelink_desc_line_1 = "Take 60 Seconds To Submit Your Info"
-		sitelink_desc_line_2 = "To Find " + seed + " Now"
+	def createCityStateSitelink3(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		sitelink_link_text_options = ["Submit Your Info Online"]
+  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, 25 )
+		
+		sitelink_desc_line_1_options = ["Take 60 Seconds To Submit Your Info"]
+		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, 35 )
+
+		sitelink_desc_line_2_options = ["To Find " + seed + " Now",
+										"To Find " + seed,
+										"To Find " + short_seed + " Now",
+										"To Find " + seed,
+										"To Find " + niche + " Classes Now",
+										"To Find " + niche + " Classes",
+										"To Find Classes Now"]
+		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, 35 )
+
 		url = sitelink_destination_url + "&sitelink-test=#{sitelink_link_text.gsub(" ","-")}"
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
 
-	def createCityStateSitelink4(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
-		sitelink_link_text = "Takes Less Than 1 Min"
-		sitelink_desc_line_1 = "Find " + seed + " Fast"
-		sitelink_desc_line_2 = "Using Our " + seed + " Search"
+	def createCityStateSitelink4(campaign, niche, seed, short_seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		sitelink_link_text_options = ["Takes Less Than 1 Min"]
+  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, 25 )
+		
+		sitelink_desc_line_1_options = ["Find " + seed + " Fast",
+										"Find " + seed,
+										"Find " + short_seed + " Fast",
+										"Find " + short_seed,
+										"Find Classes Fast"]
+		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, 35 )
+
+		sitelink_desc_line_2_options = ["Using Our " + seed + " Search",
+										"Using " + seed + " Search",
+										seed + " Search",
+										"Using Our " + short_seed + " Search",
+										"Using " + short_seed + " Search",
+										short_seed + " Search",
+										"Using Our " + niche + " Classes Search",
+										"Using " + niche + " Classes Search",
+										niche + " Classes Search"]
+		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, 35 )
+
 		url = sitelink_destination_url + "&sitelink-test=#{sitelink_link_text.gsub(" ","-")}"
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
@@ -608,13 +677,14 @@ campaignFactory = CampaignFactory.new()
 
 #Set Niche Parameters
 seed = "Human Resources Certification"
+short_seed = "HR Certification"
 niche = "Human Resources"
 landingPage = "human-resources0"
 areaOfStudy = "6B5B6155"
 concentration = "01855C0C"
 
 #Create Mod Broad City-State Campaign using Niche Parameters
-campaign = campaignFactory.createModifiedBroadCityStateCampaign(seed, niche, landingPage, areaOfStudy, concentration)
+campaign = campaignFactory.createModifiedBroadCityStateCampaign(seed, short_seed, niche, landingPage, areaOfStudy, concentration)
 
 #Output the campaign as a CSV
 output_filename = "campaign-for-import.csv"
