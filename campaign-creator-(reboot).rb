@@ -46,10 +46,10 @@ class CampaignFactory
 									"&utm_source=Google" +
 									"&utm_medium=cpc"
 
-		createCityStateSitelink1(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
-		createCityStateSitelink2(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
-		createCityStateSitelink3(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
-		createCityStateSitelink4(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		createCityStateSitelink1(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		createCityStateSitelink2(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		createCityStateSitelink3(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		createCityStateSitelink4(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
 
 		ad_group_name = seed + " in " + city + " " + state_code
 		adgroup = campaign.createAdGroup(ad_group_name)
@@ -79,34 +79,63 @@ class CampaignFactory
 		return campaign
 	end
 
-	def createCityStateSitelink1(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
-		sitelink_link_text = "Find " + seed + " Near You"
-		sitelink_desc_line_1 = "Looking for " + seed + "?"
-		sitelink_desc_line_2 = "Find " + seed + " Now"
+	def selectOptionOfLength (options_array, max_length)
+		options_array.each do |option|
+			if option.length <= max_length
+				return option
+			end 
+		end
+
+		return "ERROR: None Under " + max_length + " Characters!"
+	end
+
+	def createCityStateSitelink1(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		sitelink_link_text_options = ["Find " + seed + " Near You",
+							  		  seed + " Near You",
+							          "Find " + seed,
+							      	  seed,
+							      	  "Find " + niche + " Training",
+							      	  niche + " Training"]
+  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, 25 )
+		
+		sitelink_desc_line_1_options = ["Looking for " + seed + "?",
+										"Need " + seed + "?",
+										seed + "?",
+										"Looking for " + niche + "Classes?",
+										"Need " + niche + "?",
+										niche + " Classes?"]
+		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, 35 )
+
+		sitelink_desc_line_2_options = ["Find " + seed + " Now",
+										seed + " Now",
+										niche + " Training Now",
+										"Quick Training Finder"]
+		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, 35 )
+
 		url = sitelink_destination_url + "&sitelink-test=#{sitelink_link_text.gsub(" ","-")}"
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
 
-	def createCityStateSitelink2(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
-		sitelink_link_text = "Quick Chiropractic Schools Finder"
-		sitelink_desc_line_1 = "Use our Chiropractic Schools Finder"
-		sitelink_desc_line_2 = "To Find Chiropractic Schools Now"
+	def createCityStateSitelink2(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		sitelink_link_text = "Quick " + seed + " Finder"
+		sitelink_desc_line_1 = "Use our " + seed + " Finder"
+		sitelink_desc_line_2 = "To Find " + seed + " Now"
 		url = sitelink_destination_url + "&sitelink-test=#{sitelink_link_text.gsub(" ","-")}"
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
 
-	def createCityStateSitelink3(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+	def createCityStateSitelink3(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
 		sitelink_link_text = "Submit Your Info Online"
 		sitelink_desc_line_1 = "Take 60 Seconds To Submit Your Info"
-		sitelink_desc_line_2 = "To Find Chiropractic Schools Now"
+		sitelink_desc_line_2 = "To Find " + seed + " Now"
 		url = sitelink_destination_url + "&sitelink-test=#{sitelink_link_text.gsub(" ","-")}"
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
 
-	def createCityStateSitelink4(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+	def createCityStateSitelink4(campaign, niche, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
 		sitelink_link_text = "Takes Less Than 1 Min"
-		sitelink_desc_line_1 = "Find Chiropractic Schools Fast"
-		sitelink_desc_line_2 = "Using Our Chiropractic Schools Search"
+		sitelink_desc_line_1 = "Find " + seed + " Fast"
+		sitelink_desc_line_2 = "Using Our " + seed + " Search"
 		url = sitelink_destination_url + "&sitelink-test=#{sitelink_link_text.gsub(" ","-")}"
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
