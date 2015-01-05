@@ -22,13 +22,45 @@ class CampaignFactory
 		campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION +LOCATIONCODE} (search; modbroad)"
 		campaign = Campaign.new( name: campaign_name )
 
-		ad_group_name = seed + " in " + "City" + " " + "State"
+		city = "City"
+		state_name = "State"
+		state_code = "ST"
+
+		ad_group_name = seed + " in " + city + " " + state_code
 
 		adgroup = campaign.createAdGroup(ad_group_name)
 
 		keywordString = "+" + seed.gsub(" ", " +")
-		keyword = adgroup.createKeyword(keywordString)
+		adgroup.createKeyword(keywordString)
 
+
+		headline = seed + " " + city + " " + state_code
+		desc_line_1  = city + " " + seed + " " + state_code
+		desc_line_2  = "Find " + state_name + " " + seed
+		display_url = seed.gsub(" ","-") + ".koodlu.com/" + state_code
+		area_of_study = "75346615"
+		concentration = "AB6EE9D4"
+		location = state_name
+		sublocation = city
+		locationcode = state_code
+		page_headline = "Looking for " + seed + " in " + city + ", " + state_code
+		device_preferences = ["All", "Mobile"]
+		device_preferences.each do |device_preference|
+			device_code = "mb" if device_preference == "Mobile"
+			utm_campaign = "_src*adwords_d*{ifmobile:mb}{ifnotmobile:dt}_d2*#{device_code}_k*{keyword}_m*{matchtype}_c*{creative}_p*{adposition}_n*{network}"
+			destination_url = "http://koodlu.com/chiropractic0/" +
+							  "?area_of_study=#{area_of_study}" +
+							  "&concentration=#{concentration}" + 
+							  "&seed=#{seed.gsub(" ", "%20")}" + 
+							  "&location=#{location}" + 
+							  "&sublocation=#{sublocation}" + 
+							  "&locationcode=#{locationcode}" + 
+							  "&headline=#{page_headline}" + 
+							  "&utm_campaign=#{utm_campaign}" + 
+							  "&utm_source=Google" + 
+							  "&utm_medium=cpc"
+			adgroup.createAd(headline, desc_line_1, desc_line_2, display_url, destination_url, device_preference)
+		end
 		return campaign
 	end
 end
@@ -137,11 +169,18 @@ class Campaign
 			# Output Campaign Settings Row
 			csv << self.settingsRow
 
+			# Output location row (this must be it's own row for 
+			# Mobile Bid adjustment to work in campaign settings row)
+			csv << self.locationRow
+
 			# Output All AdGroups Settings Rows
 			@adgroups.each do |adgroup|
 			 	csv << adgroup.settingsRow
 			 	adgroup.keywords.each do |keyword|
 			 		csv << keyword.settingsRow
+			 	end
+			 	adgroup.ads.each do |ad|
+			 		csv << ad.settingsRow
 			 	end
 			end
 
@@ -151,6 +190,24 @@ class Campaign
 			# end
 
 		end
+	end
+
+	# Output the location row as an array.
+	def locationRow
+		output_row = []
+
+		@output_row_headers.each do |header|
+			case header
+			when "Campaign"
+				output_row << @name
+			when "Location"
+				output_row << @location
+			else
+				output_row << nil # Must be nil for CSV to be written properly.
+			end
+		end
+
+		output_row
 	end
 
 	# Outputs the settings row as an array
@@ -183,12 +240,10 @@ class Campaign
 				output_row << @end_date
 			when "Ad Schedule"
 				output_row << @ad_schedule
-			when "Location"
-				output_row << @location
 			when "Campaign Status"
 				output_row << @campaign_status
 			else
-				output_row << nil
+				output_row << nil # Must be nil for CSV to be written properly.
 			end
 		end
 
@@ -206,7 +261,7 @@ end
 		# => outputSettingsRow (outputs the settings row for the Ad Group as ready for campaign import CSV)
 
 class AdGroup
-	attr_accessor :keywords, :name, :ad_group_status
+	attr_accessor :ads, :keywords, :name, :ad_group_status
 
 	def initialize( opts={} )
 		opts = { campaign: nil, 
@@ -231,7 +286,16 @@ class AdGroup
 	end
 
 	# => createAds - creates ad objects for the campaign based on seed keywords
-	def createAds
+	def	createAd(headline, desc_line_1, desc_line_2, display_url, destination_url, device_preference)
+		@ads << Ad.new( campaign: @campaign,
+						ad_group: self,
+						headline: headline,
+						desc_line_1: desc_line_1,
+						desc_line_2: desc_line_2,
+						display_url: display_url,
+						destination_url: destination_url,
+						device_preference: device_preference,
+						status: "Active")
 	end
 
 	def settingsRow
@@ -262,7 +326,7 @@ class AdGroup
 			when "AdGroup Status"
 				output_row << @ad_group_status
 			else
-				output_row << nil
+				output_row << nil # Must be nil for CSV to be written properly.
 			end
 		end
 
@@ -320,7 +384,7 @@ class Keyword
 			when "Status"
 				output_row << @status
 			else
-				output_row << nil
+				output_row << nil # Must be nil for CSV to be written properly.
 			end
 		end
 
@@ -341,25 +405,60 @@ end
 	# Methods:
 		# => outputSettingsRow (outputs the settings row for the Ad Group as ready for campaign import CSV)
 class Ad
-	def initialize( opts={campaign: nil,
-						  ad_group: nil,
-						  headline: "",
-						  desc_line_1: "",
-						  desc_line_2: "",
-						  display_url: "",
-						  destination_url: "",
-						  device_preference: "All"} )
+	def initialize( opts={} )
+		opts = { campaign: nil,
+		  ad_group: nil,
+		  headline: "",
+		  desc_line_1: "",
+		  desc_line_2: "",
+		  display_url: "",
+		  destination_url: "",
+		  device_preference: "All",
+		  status: "Active"}.merge(opts)
 		@campaign = opts[:campaign]
 		@ad_group = opts[:ad_group]
 		@headline = opts[:headline]
 		@desc_line_1 = opts[:desc_line_1]
 		@desc_line_2 = opts[:desc_line_2]
 		@display_url = opts[:display_url]
-		@destination_url = opts[:url]
+		@destination_url = opts[:destination_url]
 		@device_preference = opts[:device_preference]
+		@status = opts[:status]
 	end
 
 	def settingsRow
+		output_row = []
+
+		@campaign.output_row_headers.each do |header|
+			case header
+			when "Campaign"
+				output_row << @campaign.name
+			when "Ad Group"
+				output_row << @ad_group.name
+			when "Headline"
+				output_row << @headline
+			when "Description Line 1"
+				output_row << @desc_line_1
+			when "Description Line 2"
+				output_row << @desc_line_2
+			when "Display URL"
+				output_row << @display_url
+			when "Destination URL"
+				output_row << @destination_url
+			when "Device Preference"
+				output_row << @device_preference
+			when "Campaign Status"
+				output_row << @campaign.status
+			when "AdGroup Status"
+				output_row << @ad_group.ad_group_status
+			when "Status"
+				output_row << @status
+			else
+				output_row << nil # Must be nil for CSV to be written properly.
+			end
+		end
+
+		return output_row
 	end
 end
 
