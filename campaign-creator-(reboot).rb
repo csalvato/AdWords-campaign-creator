@@ -36,21 +36,20 @@ class CampaignFactory
 		desc_line_2  = "Find " + state_name + " " + seed
 		display_url = seed.gsub(" ","-") + ".koodlu.com/" + state_code
 		page_headline = "Looking for " + seed + " in " + city + ", " + state_code
-
-		sitelink_link_text = "Find " + seed + " Near You"
-		sitelink_desc_line_1 = "Looking for " + seed + "?"
-		sitelink_desc_line_2 = "Find " + seed + " Now"
 		sitelink_utm_campaign = "_src*adwords_d*{ifmobile:mb}{ifnotmobile:dt}_k*{keyword}_m*{matchtype}_c*{creative}_p*{adposition}_n*{network}"
 		sitelink_destination_url = "http://koodlu.com/#{landingPage}/" +
 									"?area_of_study=#{area_of_study}" + 
 									"&concentration=#{concentration}" +
 									"&seed=#{seed.gsub(" ", "%20")}" +
-									"&headline=#{headline}" +
+									"&headline=#{headline.gsub(" ","%20")}" +
 									"&utm_campaign=#{sitelink_utm_campaign}" +
 									"&utm_source=Google" +
-									"&utm_medium=cpc" +
-									"&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
-		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, sitelink_destination_url)
+									"&utm_medium=cpc"
+
+		createCityStateSitelink1(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		createCityStateSitelink2(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		createCityStateSitelink3(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		createCityStateSitelink4(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
 
 		ad_group_name = seed + " in " + city + " " + state_code
 		adgroup = campaign.createAdGroup(ad_group_name)
@@ -68,9 +67,9 @@ class CampaignFactory
 							  "&concentration=#{concentration}" + 
 							  "&seed=#{seed.gsub(" ", "%20")}" + 
 							  "&location=#{location}" + 
-							  "&sublocation=#{sublocation}" + 
+							  "&sublocation=#{sublocation.gsub(" ","%20")}" + 
 							  "&locationcode=#{locationcode}" + 
-							  "&headline=#{page_headline}" + 
+							  "&headline=#{page_headline.gsub(" ","%20")}" + 
 							  "&utm_campaign=#{utm_campaign}" + 
 							  "&utm_source=Google" + 
 							  "&utm_medium=cpc"
@@ -78,6 +77,38 @@ class CampaignFactory
 		end
 
 		return campaign
+	end
+
+	def createCityStateSitelink1(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		sitelink_link_text = "Find " + seed + " Near You"
+		sitelink_desc_line_1 = "Looking for " + seed + "?"
+		sitelink_desc_line_2 = "Find " + seed + " Now"
+		url = sitelink_destination_url + "&sitelink-test=#{sitelink_link_text.gsub(" ","-")}"
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
+	end
+
+	def createCityStateSitelink2(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		sitelink_link_text = "Quick Chiropractic Schools Finder"
+		sitelink_desc_line_1 = "Use our Chiropractic Schools Finder"
+		sitelink_desc_line_2 = "To Find Chiropractic Schools Now"
+		url = sitelink_destination_url + "&sitelink-test=#{sitelink_link_text.gsub(" ","-")}"
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
+	end
+
+	def createCityStateSitelink3(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		sitelink_link_text = "Submit Your Info Online"
+		sitelink_desc_line_1 = "Take 60 Seconds To Submit Your Info"
+		sitelink_desc_line_2 = "To Find Chiropractic Schools Now"
+		url = sitelink_destination_url + "&sitelink-test=#{sitelink_link_text.gsub(" ","-")}"
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
+	end
+
+	def createCityStateSitelink4(campaign, seed, area_of_study, concentration, landingPage, headline, sitelink_destination_url)
+		sitelink_link_text = "Takes Less Than 1 Min"
+		sitelink_desc_line_1 = "Find Chiropractic Schools Fast"
+		sitelink_desc_line_2 = "Using Our Chiropractic Schools Search"
+		url = sitelink_destination_url + "&sitelink-test=#{sitelink_link_text.gsub(" ","-")}"
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
 end
 
