@@ -23,9 +23,11 @@ class CampaignFactory
 		campaign = Campaign.new( name: campaign_name )
 
 		ad_group_name = seed + " in " + "City" + " " + "State"
-		keywords = [ "+" + seed.gsub(" ", " +")]
 
 		adgroup = campaign.createAdGroup(ad_group_name)
+
+		keywordString = "+" + seed.gsub(" ", " +")
+		keyword = adgroup.createKeyword(keywordString)
 
 		return campaign
 	end
@@ -54,7 +56,7 @@ class Campaign
 				bid_strategy_type: "Manual CPC",
 				enhanced_cpc: "Disabled",
 				viewable_cpm: "Disabled",
-				bid_adjustment: "-100",
+				bid_modifier: "-100",
 				start_date: Time.now.strftime("%m-%d-%Y"),
 				end_date: "[]",
 				ad_schedule: "[]",
@@ -70,7 +72,7 @@ class Campaign
 		@bid_strategy_type = opts[:bid_strategy_type]
 		@enhanced_cpc = opts[:enhanced_cpc]
 		@viewable_cpm = opts[:viewable_cpm]
-		@bid_adjustment = opts[:bid_adjustment]
+		@bid_modifier = opts[:bid_modifier]
 		@start_date = opts[:start_date]
 		@end_date = opts[:end_date]
 		@ad_schedule = opts[:ad_schedule]
@@ -101,7 +103,7 @@ class Campaign
 								"Bid Strategy Name",
 								"Enhanced CPC",
 								"Viewable CPM",
-								"Bid Adjustment",
+								"Bid Modifier",
 								"Sitelink Text",
 								"Headline",
 								"Description Line 1",
@@ -121,13 +123,15 @@ class Campaign
 
 	def createAdGroup(name)
 		# Create ad group object
-		@adgroups << AdGroup.new( name: name, 
+		new_ad_group = AdGroup.new( name: name, 
 								  campaign: self)
+		@adgroups <<  new_ad_group
+		return new_ad_group
 	end
 
 	def outputCampaign(output_filename)
 
-		CSV.open(output_filename, "wb") do |csv|
+		CSV.open(output_filename, "wb", {:encoding => "utf-8", force_quotes: false }) do |csv|
 			# Create Headers
 			csv << @output_row_headers
 			# Output Campaign Settings Row
@@ -136,6 +140,9 @@ class Campaign
 			# Output All AdGroups Settings Rows
 			@adgroups.each do |adgroup|
 			 	csv << adgroup.settingsRow
+			 	adgroup.keywords.each do |keyword|
+			 		csv << keyword.settingsRow
+			 	end
 			end
 
 			# # Output All Sitelinks Settings Rows
@@ -168,8 +175,8 @@ class Campaign
 				output_row << @enhanced_cpc
 			when "Viewable CPM"
 				output_row << @viewable_cpm
-			when "Bid Adjustment"
-				output_row << @bid_adjustment
+			when "Bid Modifier"
+				output_row << @bid_modifier
 			when "Start Date"
 				output_row << @start_date
 			when "End Date"
@@ -181,7 +188,7 @@ class Campaign
 			when "Campaign Status"
 				output_row << @campaign_status
 			else
-				output_row << ""
+				output_row << nil
 			end
 		end
 
@@ -199,6 +206,8 @@ end
 		# => outputSettingsRow (outputs the settings row for the Ad Group as ready for campaign import CSV)
 
 class AdGroup
+	attr_accessor :keywords, :name, :ad_group_status
+
 	def initialize( opts={} )
 		opts = { campaign: nil, 
 				 name: "Default AdGroup Name", 
@@ -211,6 +220,14 @@ class AdGroup
 		@keywords = opts[:keywords]
 		@ads = opts[:ads]
 		@ad_group_status = opts[:ad_group_status]
+	end
+
+	# => createAds - creates ad objects for the campaign based on seed keywords
+	def createKeyword(keywordString)
+		# Create ad group object
+		@keywords << Keyword.new( campaign: @campaign,
+		 		 				  ad_group: self,
+						 		  keyword: keywordString)
 	end
 
 	# => createAds - creates ad objects for the campaign based on seed keywords
@@ -245,7 +262,7 @@ class AdGroup
 			when "AdGroup Status"
 				output_row << @ad_group_status
 			else
-				output_row << ""
+				output_row << nil
 			end
 		end
 
@@ -264,21 +281,50 @@ end
 	# Methods:
 		# => outputSettingsRow (outputs the settings row for the Ad Group as ready for campaign import CSV)
 class Keyword
-	def initialize( opts={campaign: nil,
-		 				  ad_group: nil,
-		 				  max_cpc: 0.50,
-		 				  keyword: "",
-		 				  type: "Broad",
-		 				  device: "All"} )
+	def initialize( opts={} )
+		opts = { campaign: nil,
+		 		 ad_group: nil,
+		 		 max_cpc: 0.50,
+		 		 keyword: "",
+		 		 type: "Broad",
+		 		 device: "All",
+		 		 status: "Active"}.merge(opts)
 		@campaign = opts[:campaign]
 		@ad_group = opts[:ad_group]
 		@max_cpc = opts[:max_cpc]
 		@keyword = opts[:keyword]
 		@type = opts[:type]
 		@device = opts[:device]
+		@status = opts[:status]
 	end
 
 	def settingsRow
+		output_row = []
+
+		@campaign.output_row_headers.each do |header|
+			case header
+			when "Campaign"
+				output_row << @campaign.name
+			when "Ad Group"
+				output_row << @ad_group.name
+			when "Max CPC"
+				output_row << @max_cpc
+			when "Keyword"
+				output_row << @keyword
+			when "Criterion Type"
+				output_row << @type
+			when "Campaign Status"
+				output_row << @campaign.status
+			when "AdGroup Status"
+				output_row << @ad_group.ad_group_status
+			when "Status"
+				output_row << @status
+			else
+				output_row << nil
+			end
+		end
+
+		return output_row
 	end
 end
 
