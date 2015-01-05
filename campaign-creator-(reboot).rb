@@ -22,33 +22,48 @@ class CampaignFactory
 		campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION +LOCATIONCODE} (search; modbroad)"
 		campaign = Campaign.new( name: campaign_name )
 
+		# Set some initial variables
 		city = "City"
 		state_name = "State"
 		state_code = "ST"
+		area_of_study = "75346615"
+		concentration = "AB6EE9D4"
+		location = state_name
+		sublocation = city
+		locationcode = state_code
+		headline = seed + " " + city + " " + state_code
+		desc_line_1  = city + " " + seed + " " + state_code
+		desc_line_2  = "Find " + state_name + " " + seed
+		display_url = seed.gsub(" ","-") + ".koodlu.com/" + state_code
+		page_headline = "Looking for " + seed + " in " + city + ", " + state_code
+
+		sitelink_link_text = "Find " + seed + " Near You"
+		sitelink_desc_line_1 = "Looking for " + seed + "?"
+		sitelink_desc_line_2 = "Find " + seed + " Now"
+		sitelink_utm_campaign = "_src*adwords_d*{ifmobile:mb}{ifnotmobile:dt}_k*{keyword}_m*{matchtype}_c*{creative}_p*{adposition}_n*{network}"
+		sitelink_destination_url = "http://koodlu.com/#{landingPage}/" +
+									"?area_of_study=#{area_of_study}" + 
+									"&concentration=#{concentration}" +
+									"&seed=#{seed.gsub(" ", "%20")}" +
+									"&headline=#{headline}" +
+									"&utm_campaign=#{sitelink_utm_campaign}" +
+									"&utm_source=Google" +
+									"&utm_medium=cpc" +
+									"&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, sitelink_destination_url)
 
 		ad_group_name = seed + " in " + city + " " + state_code
-
 		adgroup = campaign.createAdGroup(ad_group_name)
 
 		keywordString = "+" + seed.gsub(" ", " +")
 		adgroup.createKeyword(keywordString)
 
 
-		headline = seed + " " + city + " " + state_code
-		desc_line_1  = city + " " + seed + " " + state_code
-		desc_line_2  = "Find " + state_name + " " + seed
-		display_url = seed.gsub(" ","-") + ".koodlu.com/" + state_code
-		area_of_study = "75346615"
-		concentration = "AB6EE9D4"
-		location = state_name
-		sublocation = city
-		locationcode = state_code
-		page_headline = "Looking for " + seed + " in " + city + ", " + state_code
 		device_preferences = ["All", "Mobile"]
 		device_preferences.each do |device_preference|
 			device_code = "mb" if device_preference == "Mobile"
 			utm_campaign = "_src*adwords_d*{ifmobile:mb}{ifnotmobile:dt}_d2*#{device_code}_k*{keyword}_m*{matchtype}_c*{creative}_p*{adposition}_n*{network}"
-			destination_url = "http://koodlu.com/chiropractic0/" +
+			destination_url = "http://koodlu.com/#{landingPage}/" +
 							  "?area_of_study=#{area_of_study}" +
 							  "&concentration=#{concentration}" + 
 							  "&seed=#{seed.gsub(" ", "%20")}" + 
@@ -61,6 +76,7 @@ class CampaignFactory
 							  "&utm_medium=cpc"
 			adgroup.createAd(headline, desc_line_1, desc_line_2, display_url, destination_url, device_preference)
 		end
+
 		return campaign
 	end
 end
@@ -136,7 +152,7 @@ class Campaign
 								"Enhanced CPC",
 								"Viewable CPM",
 								"Bid Modifier",
-								"Sitelink Text",
+								"Link Text",
 								"Headline",
 								"Description Line 1",
 								"Description Line 2",
@@ -161,6 +177,15 @@ class Campaign
 		return new_ad_group
 	end
 
+	def createSitelink(link_text, desc_line_1, desc_line_2, destination_url)
+		@sitelinks << Sitelink.new( campaign: self,
+									desc_line_1: desc_line_1,
+									desc_line_2: desc_line_2,
+									destination_url: destination_url,
+									link_text: link_text
+									)
+	end 
+
 	def outputCampaign(output_filename)
 
 		CSV.open(output_filename, "wb", {:encoding => "utf-8", force_quotes: false }) do |csv|
@@ -184,10 +209,10 @@ class Campaign
 			 	end
 			end
 
-			# # Output All Sitelinks Settings Rows
-			# @sitelinks.each do |sitelink|
-			# 	csv << sitelink.outputSitelink
-			# end
+			# Output All Sitelinks Settings Rows
+			@sitelinks.each do |sitelink|
+				csv << sitelink.settingsRow
+			end
 
 		end
 	end
@@ -251,6 +276,63 @@ class Campaign
 	end
 end
 
+class Sitelink
+	def initialize( opts={} )
+		opts = {campaign: nil, 
+				desc_line_1: "",
+				desc_line_2: "",
+				destination_url: "",
+				link_text: "",
+				status: "Active"
+			}.merge(opts)
+		@campaign = opts[:campaign]
+		@desc_line_1 = opts[:desc_line_1]
+		@desc_line_2 = opts[:desc_line_2]
+		@destination_url = opts[:destination_url]
+		@link_text = opts[:link_text]
+		@status = opts[:status]
+	end
+
+	def settingsRow
+		output_row = []
+		
+		@campaign.output_row_headers.each do |header|
+			case header
+			when "Campaign"
+				output_row << @campaign.name
+			when "Start Date"
+				output_row << "[]"
+			when "End Date"
+				output_row << "[]"
+			when "Ad Schedule"
+				output_row << "[]"
+			when "Description Line 1"
+				output_row << @desc_line_1
+			when "Description Line 2"
+				output_row << @desc_line_2
+			when "Destination URL"
+				output_row << @destination_url
+			when "Device Preference"
+				output_row << "All"
+			when "Link Text"
+				output_row << @link_text
+			when "Feed Name"
+				output_row << "Main sitelink feed"
+			when "Platform Targeting"
+				output_row << "All"
+			when "Campaign Status"	
+				output_row << @campaign.status
+			when "Status"
+				output_row << @status
+			else
+				output_row << nil # Must be nil for CSV to be written properly.
+			end
+		end
+
+		output_row
+	end
+end
+
 # Class representing an Ad Group (a group of keywords)
 	# Properties:
 		# => campaign (Campaign object this ad group belongs to)
@@ -277,7 +359,6 @@ class AdGroup
 		@ad_group_status = opts[:ad_group_status]
 	end
 
-	# => createAds - creates ad objects for the campaign based on seed keywords
 	def createKeyword(keywordString)
 		# Create ad group object
 		@keywords << Keyword.new( campaign: @campaign,
