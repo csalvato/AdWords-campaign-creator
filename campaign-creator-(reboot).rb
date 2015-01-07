@@ -876,26 +876,31 @@ class Ad
 end
 
 #Set Niche Parameters
-seed = "Human Resources Certification"
-short_seed = "HR Certification"
-niche = "Human Resources"
-landingPage = "human-resources0"
-areaOfStudy = "6B5B6155"
-concentration = "01855C0C"
+seeds_file_path = "seeds-for-import.csv"
+seeds = CSV.read(seeds_file_path, :headers => true, :encoding => 'windows-1251:utf-8')
 
-# Create Campaign Factory to help with campaign creation
-cityStateCampaignFactory = ModifiedBroadCityStateCampaignFactory.new(location_file_path: "city-state-location-data.csv")
-cityCampaignFactory = ModifiedBroadCityCampaignFactory.new(location_file_path: "city-location-data.csv")
-# Create Mod Broad City-State Campaign using Niche Parameters
-campaigns = cityStateCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration)
-campaigns.concat( cityCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
+seeds.each do |seed_data|
+	seed = seed_data["Seed"]
+	short_seed = seed_data["Short Seed"]
+	niche = seed_data["Niche"]
+	landingPage = seed_data["Landing Page"]
+	areaOfStudy = seed_data["Area of Study"]
+	concentration = seed_data["Concentration"]
 
-#Output the campaign as a CSV
-output_filename = "campaign-for-import.csv"
-first = true
-campaigns.each_with_index do |campaign, index|
-	first = false if index > 0
-	campaign.outputCampaign(output_filename, first)
+	# Create Campaign Factory to help with campaign creation
+	cityStateCampaignFactory = ModifiedBroadCityStateCampaignFactory.new(location_file_path: "city-state-location-data.csv")
+	cityCampaignFactory = ModifiedBroadCityCampaignFactory.new(location_file_path: "city-location-data.csv")
+	# Create Mod Broad City-State Campaign using Niche Parameters
+	campaigns = cityStateCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration)
+	campaigns.concat( cityCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
+
+	#Output the campaign as a CSV
+	output_filename = "campaign-for-import.csv"
+	first = true
+	campaigns.each_with_index do |campaign, index|
+		first = false if index > 0
+		campaign.outputCampaign(output_filename, first)
+	end
 end
 
 puts "Script Complete!"
