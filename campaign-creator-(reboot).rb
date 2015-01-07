@@ -13,84 +13,21 @@ puts "Starting Script..."
 require 'csv'
 
 class CampaignFactory
-end
-
-# Class representing a "Campaign Factory" that can make different kinds of campaigns
-class ModifiedBroadCityStateCampaignFactory << CampaignFactory
-
 	@@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN = 20000
-	def initialize(opts={})
-		
+
+	def initialize(opts={})	
 	end
 
-	def create(location_file_path, seed, short_seed, niche, landingPage, area_of_study, concentration)
-		# Read all locations from file and store as array of arrays
-		locations = CSV.read(location_file_path, :headers => true, :encoding => 'windows-1251:utf-8')
-		total_groups = (locations.length.to_f / @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN).ceil
-
-		base_campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION +LOCATIONCODE} (search; modbroad)"
-
-		campaigns = Array[]
-		campaign_counter = 1
-		if locations.length < @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN
-			campaigns << Campaign.new( name: base_campaign_name )
-		else
-			campaigns << Campaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s)
+	def selectOptionOfLength (options_array, max_length)
+		options_array.each do |option|
+			if option.length <= max_length
+				return option
+			end 
 		end
-		current_campaign = campaigns.last
-		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
 
-
-		locations.each_with_index do |row, index|
-			# Set some initial variables
-			city = row["City"]
-			state_name = row["State Name"]
-			state_code = row["State Code"]
-
-			location = state_name
-			sublocation = city
-			locationcode = state_code
-
-			page_headline = "Looking for " + seed + " in " + city + ", " + state_code + "?"
-
-			ad_group_name = seed + " in " + city + " " + state_code
-			adgroup = current_campaign.createAdGroup(ad_group_name)
-
-			keywordString = "+" + (seed + " " + city + " " + state_code).gsub(" ", " +")
-			adgroup.createKeyword(keywordString)
-
-
-			device_preferences = ["All", "Mobile"]
-			device_preferences.each do |device_preference|
-				if device_preference == "Mobile"
-					device_code = "mb" 			
-				else
-					device_code = "dt"
-				end
-				utm_campaign = "_src*adwords_d*{ifmobile:mb}{ifnotmobile:dt}_d2*#{device_code}_k*{keyword}_m*{matchtype}_c*{creative}_p*{adposition}_n*{network}"
-				destination_url = "http://koodlu.com/#{landingPage}/" +
-								  "?area_of_study=#{area_of_study}" +
-								  "&concentration=#{concentration}" + 
-								  "&seed=#{seed.gsub(" ", "%20")}" + 
-								  "&location=#{location}" + 
-								  "&sublocation=#{sublocation.gsub(" ","%20")}" + 
-								  "&locationcode=#{locationcode}" + 
-								  "&headline=#{page_headline.gsub(" ","%20")}" + 
-								  "&utm_campaign=#{utm_campaign}" + 
-								  "&utm_source=Google" + 
-								  "&utm_medium=cpc"
-				createCityStateAd(adgroup, niche, seed, short_seed, city, state_name, state_code, destination_url, device_preference)
-			end
-
-			ad_group_count = index + 1
-			if ad_group_count % @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN == 0
-				campaign_counter += 1
-				campaigns << Campaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
-				current_campaign = campaigns.last
-				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
-			end
-		end
-		return campaigns
+		error_message = "ERROR: None Under " + max_length.to_s + " Characters!"
+		puts error_message
+		return error_message
 	end
 
 	def createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
@@ -105,80 +42,13 @@ class ModifiedBroadCityStateCampaignFactory << CampaignFactory
 									"&utm_source=Google" +
 									"&utm_medium=cpc"
 
-		createCityStateSitelink1(current_campaign, niche, seed, short_seed, sitelink_destination_url)
-		createCityStateSitelink2(current_campaign, niche, seed, short_seed, sitelink_destination_url)
-		createCityStateSitelink3(current_campaign, niche, seed, short_seed, sitelink_destination_url)
-		createCityStateSitelink4(current_campaign, niche, seed, short_seed, sitelink_destination_url)
+		createSitelink1(current_campaign, niche, seed, short_seed, sitelink_destination_url)
+		createSitelink2(current_campaign, niche, seed, short_seed, sitelink_destination_url)
+		createSitelink3(current_campaign, niche, seed, short_seed, sitelink_destination_url)
+		createSitelink4(current_campaign, niche, seed, short_seed, sitelink_destination_url)
 	end
 
-	def selectOptionOfLength (options_array, max_length)
-		options_array.each do |option|
-			if option.length <= max_length
-				return option
-			end 
-		end
-
-		return "ERROR: None Under " + max_length.to_s + " Characters!"
-	end
-
-	def createCityStateAd(adgroup, niche, seed, short_seed, city, state_name, state_code, destination_url, device_preference)
-		headline_options = [seed + " " + city + " " + state_code,
-							seed + " " + city,
-							seed + " " + state_name,
-							seed + " " + state_code,
-							seed,
-							short_seed + " " + city + " " + state_code,
-							short_seed + " " + city,
-							short_seed + " " + state_name,
-							short_seed + " " + state_code,
-							short_seed]
-		headline = selectOptionOfLength( headline_options, 25 )
-		
-		desc_line_1_options = [city + " " + seed + " " + state_name + "?",
-							   city + " " + seed + " " + state_code + "?",
-							   city + " " + seed + "?",
-							   state_name + " " + seed + "?",
-							   state_code + " " + seed + "?",
-							   seed + "?",
-							   city + " " + short_seed + " " + state_name + "?",
-							   city + " " + short_seed + " " + state_code + "?",
-							   city + " " + short_seed + "?",
-							   state_name + " " + short_seed + "?",
-							   state_code + " " + short_seed + "?",
-							   short_seed + "?",]
-		desc_line_1 = selectOptionOfLength( desc_line_1_options, 35 )
-
-		desc_line_2_options  = ["Find " + city + " " + seed,
-								"Find " + state_name + " " + seed,
-							    "Find " + state_code + " " + seed,
-								"Find " + seed,
-								seed,
-								"Find " + city + " " + short_seed,
-								"Find " + state_name + " " + short_seed,
-							    "Find " + state_code + " " + short_seed,
-								"Find " + short_seed,
-								short_seed]
-		desc_line_2 = selectOptionOfLength( desc_line_2_options, 35 )
-
-
-		display_url_options = [ seed.gsub(" ","-") + ".koodlu.com/" + city.gsub(" ", "-"),
-								seed.gsub(" ","-") + ".koodlu.com/" + state_name.gsub(" ", "-"),
-								seed.gsub(" ","-") + ".koodlu.com/" + state_code,
-								seed.gsub(" ","-") + ".koodlu.com",
-								niche.gsub(" ","-") + ".koodlu.com/" + city.gsub(" ", "-"),
-								niche.gsub(" ","-") + ".koodlu.com/" + state_name.gsub(" ", "-"),
-								niche.gsub(" ","-") + ".koodlu.com/" + state_code,
-								niche.gsub(" ","-") + ".koodlu.com",
-								short_seed.gsub(" ","-") + ".koodlu.com/" + city.gsub(" ", "-"),
-								short_seed.gsub(" ","-") + ".koodlu.com/" + state_name.gsub(" ", "-"),
-								short_seed.gsub(" ","-") + ".koodlu.com/" + state_code,
-								short_seed.gsub(" ","-") + ".koodlu.com",]
-		display_url = selectOptionOfLength( display_url_options, 35 )
-
-		adgroup.createAd(headline, desc_line_1, desc_line_2, display_url, destination_url, device_preference)
-	end
-
-	def createCityStateSitelink1(campaign, niche, seed, short_seed, sitelink_destination_url)
+	def createSitelink1(campaign, niche, seed, short_seed, sitelink_destination_url)
 		sitelink_link_text_options = ["Find " + seed + " Near You",
 							  		  seed + " Near You",
 							          "Find " + seed,
@@ -214,7 +84,7 @@ class ModifiedBroadCityStateCampaignFactory << CampaignFactory
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
 
-	def createCityStateSitelink2(campaign, niche, seed, short_seed, sitelink_destination_url)
+	def createSitelink2(campaign, niche, seed, short_seed, sitelink_destination_url)
 		sitelink_link_text_options = ["Quick " + seed + " Finder",
 							  		  seed + " Finder",
 							  		  "Quick" + short_seed + " Finder",
@@ -244,7 +114,7 @@ class ModifiedBroadCityStateCampaignFactory << CampaignFactory
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
 
-	def createCityStateSitelink3(campaign, niche, seed, short_seed, sitelink_destination_url)
+	def createSitelink3(campaign, niche, seed, short_seed, sitelink_destination_url)
 		sitelink_link_text_options = ["Submit Your Info Online"]
   	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, 25 )
 		
@@ -264,7 +134,7 @@ class ModifiedBroadCityStateCampaignFactory << CampaignFactory
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
 
-	def createCityStateSitelink4(campaign, niche, seed, short_seed, sitelink_destination_url)
+	def createSitelink4(campaign, niche, seed, short_seed, sitelink_destination_url)
 		sitelink_link_text_options = ["Takes Less Than 1 Min"]
   	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, 25 )
 		
@@ -289,7 +159,255 @@ class ModifiedBroadCityStateCampaignFactory << CampaignFactory
 		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
+
+	def createAd(adgroup, headline_options, desc_line_1_options, desc_line_2_options, display_url_options, destination_url, device_preference)
+		headline = selectOptionOfLength( headline_options, 25 )
+		desc_line_1 = selectOptionOfLength( desc_line_1_options, 35 )
+		desc_line_2 = selectOptionOfLength( desc_line_2_options, 35 )
+		display_url = selectOptionOfLength( display_url_options, 35 )
+		
+		adgroup.createAd(headline, desc_line_1, desc_line_2, display_url, destination_url, device_preference)
+	end
+
 end
+
+# Class representing a "Campaign Factory" that can make City/State Campaigns
+class ModifiedBroadCityStateCampaignFactory < CampaignFactory
+	def initialize(opts={})	
+		opts = {location_file_path: "location-data.csv"}.merge(opts)
+		# Read all locations from file and store as array of arrays
+		@locations = CSV.read(opts[:location_file_path], :headers => true, :encoding => 'windows-1251:utf-8')
+	end
+
+	def create(seed, short_seed, niche, landingPage, area_of_study, concentration)
+		total_groups = (@locations.length.to_f / @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN).ceil
+
+		base_campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION +LOCATIONCODE} (search; modbroad)"
+
+		campaigns = Array[]
+		campaign_counter = 1
+		if @locations.length < @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN
+			campaigns << Campaign.new( name: base_campaign_name )
+		else
+			campaigns << Campaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s)
+		end
+		current_campaign = campaigns.last
+		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
+
+
+		@locations.each_with_index do |row, index|
+			# Set some initial variables
+			city = row["City"]
+			state_name = row["State Name"]
+			state_code = row["State Code"]
+
+			location = state_name
+			sublocation = city
+			locationcode = state_code
+
+			page_headline = "Looking for " + seed + " in " + city + ", " + state_code + "?"
+
+			ad_group_name = seed + " in " + city + " " + state_code
+			adgroup = current_campaign.createAdGroup(ad_group_name)
+
+			keywordString = "+" + (seed + " " + city + " " + state_code).gsub(" ", " +")
+			adgroup.createKeyword(keywordString)
+
+
+			utm_campaign = "_src*adwords_d*{ifmobile:mb}{ifnotmobile:dt}_k*{keyword}_m*{matchtype}_c*{creative}_p*{adposition}_n*{network}"
+			destination_url = "http://koodlu.com/#{landingPage}/" +
+							  "?area_of_study=#{area_of_study}" +
+							  "&concentration=#{concentration}" + 
+							  "&seed=#{seed.gsub(" ", "%20")}" + 
+							  "&location=#{location}" + 
+							  "&sublocation=#{sublocation.gsub(" ","%20")}" + 
+							  "&locationcode=#{locationcode}" + 
+							  "&headline=#{page_headline.gsub(" ","%20")}" + 
+							  "&utm_campaign=#{utm_campaign}" + 
+							  "&utm_source=Google" + 
+							  "&utm_medium=cpc"
+			headline_options = createHeadlineOptions( niche, seed, short_seed, city, state_code, state_name )
+			desc_line_1_options = createDescLine1Options( niche, seed, short_seed, city, state_code, state_name )
+			desc_line_2_options = createDescLine2Options( niche, seed, short_seed, city, state_code, state_name )
+			display_url_options = createDisplayURLOptions( niche, seed, short_seed, city, state_code, state_name )
+			device_preference = "All"
+			createAd(adgroup, headline_options, desc_line_1_options, desc_line_2_options, display_url_options, destination_url, device_preference)
+		
+
+			ad_group_count = index + 1
+			if ad_group_count % @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN == 0
+				campaign_counter += 1
+				campaigns << Campaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
+				current_campaign = campaigns.last
+				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
+			end
+		end
+		return campaigns
+	end
+
+	def createHeadlineOptions( niche, seed, short_seed, city, state_code, state_name )
+		[seed + " " + city + " " + state_code,
+		seed + " " + city,
+		seed + " " + state_name,
+		seed + " " + state_code,
+		seed,
+		short_seed + " " + city + " " + state_code,
+		short_seed + " " + city,
+		short_seed + " " + state_name,
+		short_seed + " " + state_code,
+		short_seed]
+	end
+
+	def createDescLine1Options( niche, seed, short_seed, city, state_code, state_name )
+		[city + " " + seed + " " + state_name + "?",
+		city + " " + seed + " " + state_code + "?",
+		city + " " + seed + "?",
+		state_name + " " + seed + "?",
+		state_code + " " + seed + "?",
+		seed + "?",
+		city + " " + short_seed + " " + state_name + "?",
+		city + " " + short_seed + " " + state_code + "?",
+		city + " " + short_seed + "?",
+		state_name + " " + short_seed + "?",
+		state_code + " " + short_seed + "?",
+		short_seed + "?",]
+	end
+
+	def createDescLine2Options( niche, seed, short_seed, city, state_code, state_name )
+		["Find " + city + " " + seed,
+		"Find " + state_name + " " + seed,
+	    "Find " + state_code + " " + seed,
+		"Find " + seed,
+		seed,
+		"Find " + city + " " + short_seed,
+		"Find " + state_name + " " + short_seed,
+	    "Find " + state_code + " " + short_seed,
+		"Find " + short_seed,
+		short_seed]
+	end
+
+	def createDisplayURLOptions( niche, seed, short_seed, city, state_code, state_name )
+		[ seed.gsub(" ","-") + ".koodlu.com/" + city.gsub(" ", "-"),
+		seed.gsub(" ","-") + ".koodlu.com/" + state_name.gsub(" ", "-"),
+		seed.gsub(" ","-") + ".koodlu.com/" + state_code,
+		seed.gsub(" ","-") + ".koodlu.com",
+		niche.gsub(" ","-") + ".koodlu.com/" + city.gsub(" ", "-"),
+		niche.gsub(" ","-") + ".koodlu.com/" + state_name.gsub(" ", "-"),
+		niche.gsub(" ","-") + ".koodlu.com/" + state_code,
+		niche.gsub(" ","-") + ".koodlu.com",
+		short_seed.gsub(" ","-") + ".koodlu.com/" + city.gsub(" ", "-"),
+		short_seed.gsub(" ","-") + ".koodlu.com/" + state_name.gsub(" ", "-"),
+		short_seed.gsub(" ","-") + ".koodlu.com/" + state_code,
+		short_seed.gsub(" ","-") + ".koodlu.com"]
+	end
+end
+
+# Class representing a "Campaign Factory" that can make City Campaigns
+class ModifiedBroadCityCampaignFactory < CampaignFactory
+	def initialize(opts={})	
+		opts = {location_file_path: "location-data.csv"}.merge(opts)
+		# Read all locations from file and store as array of arrays
+		@locations = CSV.read(opts[:location_file_path], :headers => true, :encoding => 'windows-1251:utf-8')
+	end
+
+	def create(seed, short_seed, niche, landingPage, area_of_study, concentration)
+		total_groups = (@locations.length.to_f / @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN).ceil
+
+		base_campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION} (search; modbroad)"
+
+		campaigns = Array[]
+		campaign_counter = 1
+		if @locations.length < @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN
+			campaigns << Campaign.new( name: base_campaign_name )
+		else
+			campaigns << Campaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s)
+		end
+		current_campaign = campaigns.last
+		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
+
+
+		@locations.each_with_index do |row, index|
+			# Set some initial variables
+			city = row["City"]
+
+			sublocation = city
+
+			page_headline = "Looking for " + seed + " in " + city + "?"
+
+			ad_group_name = seed + " in " + city
+			adgroup = current_campaign.createAdGroup(ad_group_name)
+
+			keywordString = "+" + (seed + " " + city).gsub(" ", " +")
+			adgroup.createKeyword(keywordString)
+
+
+			utm_campaign = "_src*adwords_d*{ifmobile:mb}{ifnotmobile:dt}_k*{keyword}_m*{matchtype}_c*{creative}_p*{adposition}_n*{network}"
+			destination_url = "http://koodlu.com/#{landingPage}/" +
+							  "?area_of_study=#{area_of_study}" +
+							  "&concentration=#{concentration}" + 
+							  "&seed=#{seed.gsub(" ", "%20")}" + 
+							  "&location=#{sublocation.gsub(" ","%20")}" +
+							  "&headline=#{page_headline.gsub(" ","%20")}" + 
+							  "&utm_campaign=#{utm_campaign}" + 
+							  "&utm_source=Google" + 
+							  "&utm_medium=cpc"
+			headline_options = createHeadlineOptions( niche, seed, short_seed, city )
+			desc_line_1_options = createDescLine1Options( niche, seed, short_seed, city )
+			desc_line_2_options = createDescLine2Options( niche, seed, short_seed, city )
+			display_url_options = createDisplayURLOptions( niche, seed, short_seed, city )
+			device_preference = "All"
+			createAd(adgroup, headline_options, desc_line_1_options, desc_line_2_options, display_url_options, destination_url, device_preference)
+
+			ad_group_count = index + 1
+			if ad_group_count % @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN == 0
+				campaign_counter += 1
+				campaigns << Campaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
+				current_campaign = campaigns.last
+				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
+			end
+		end
+		return campaigns
+	end
+
+	def createHeadlineOptions( niche, seed, short_seed, city )
+		[seed + " " + city,
+		seed,
+		short_seed + " " + city,
+		short_seed,
+		niche + " Classes " + city,
+		niche + " " + city]
+	end
+
+	def createDescLine1Options( niche, seed, short_seed, city )
+		[city + " " + seed + "?",
+		city + " " + short_seed + "?",
+		seed + "?",
+		niche + " Classes?",
+		short_seed + "?",
+		seed,
+		short_seed]
+	end
+
+	def createDescLine2Options( niche, seed, short_seed, city )
+		["Find " + city + " " + seed,
+		"Find " + seed,
+		seed,
+		"Find " + city + " " + short_seed,
+		"Find " + short_seed,
+		short_seed]
+	end
+
+	def createDisplayURLOptions( niche, seed, short_seed, city )
+		[ seed.gsub(" ","-") + ".koodlu.com/" + city.gsub(" ", "-"),
+		seed.gsub(" ","-") + ".koodlu.com",
+		niche.gsub(" ","-") + ".koodlu.com/" + city.gsub(" ", "-"),
+		niche.gsub(" ","-") + ".koodlu.com",
+		short_seed.gsub(" ","-") + ".koodlu.com/" + city.gsub(" ", "-"),
+		short_seed.gsub(" ","-") + ".koodlu.com"]
+	end
+end
+
+
 
 # Class representing a campaign
 	# Properties:
@@ -765,10 +883,12 @@ landingPage = "human-resources0"
 areaOfStudy = "6B5B6155"
 concentration = "01855C0C"
 
-#Create Campaign Factory to help with campaign creation
-campaignFactory = ModifiedBroadCityStateCampaignFactory.new()
-#Create Mod Broad City-State Campaign using Niche Parameters
-campaigns = campaignFactory.create("location-data.csv", seed, short_seed, niche, landingPage, areaOfStudy, concentration)
+# Create Campaign Factory to help with campaign creation
+cityStateCampaignFactory = ModifiedBroadCityStateCampaignFactory.new(location_file_path: "city-state-location-data.csv")
+cityCampaignFactory = ModifiedBroadCityCampaignFactory.new(location_file_path: "city-location-data.csv")
+# Create Mod Broad City-State Campaign using Niche Parameters
+campaigns = cityStateCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration)
+campaigns.concat( cityCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
 
 #Output the campaign as a CSV
 output_filename = "campaign-for-import.csv"
