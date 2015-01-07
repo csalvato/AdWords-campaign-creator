@@ -886,13 +886,31 @@ seeds.each do |seed_data|
 	landingPage = seed_data["Landing Page"]
 	areaOfStudy = seed_data["Area of Study"]
 	concentration = seed_data["Concentration"]
+	
+	if seed_data["Create City State?"] == ""
+		createCityState = false
+	else
+		createCityState = true
+	end
+	
+	if seed_data["Create City?"] == ""
+		createCity = false
+	else
+		createCity = true
+	end
+
 
 	# Create Campaign Factory to help with campaign creation
-	cityStateCampaignFactory = ModifiedBroadCityStateCampaignFactory.new(location_file_path: "city-state-location-data.csv")
-	cityCampaignFactory = ModifiedBroadCityCampaignFactory.new(location_file_path: "city-location-data.csv")
-	# Create Mod Broad City-State Campaign using Niche Parameters
-	campaigns = cityStateCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration)
-	campaigns.concat( cityCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
+	campaigns = Array[]
+	if createCityState
+		cityStateCampaignFactory = ModifiedBroadCityStateCampaignFactory.new(location_file_path: "city-state-location-data.csv")
+		campaigns.concat( cityStateCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
+	end
+
+	if createCity
+		cityCampaignFactory = ModifiedBroadCityCampaignFactory.new(location_file_path: "city-location-data.csv")
+		campaigns.concat( cityCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
+	end
 
 	#Output the campaign as a CSV
 	output_filename = "campaign-for-import.csv"
