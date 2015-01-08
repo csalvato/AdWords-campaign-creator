@@ -689,23 +689,6 @@ class BingCampaign
 								"Status"]
 	end
 
-	def createAdGroup(name)
-		# Create ad group object
-		new_ad_group = AdGroup.new( name: name, 
-								  campaign: self)
-		@adgroups <<  new_ad_group
-		return new_ad_group
-	end
-
-	def createSitelink(link_text, desc_line_1, desc_line_2, destination_url)
-		@sitelinks << Sitelink.new( campaign: self,
-									desc_line_1: desc_line_1,
-									desc_line_2: desc_line_2,
-									destination_url: destination_url,
-									link_text: link_text
-									)
-	end 
-
 	# Set first to true if it is the first campaign in a set of campaigns that need to be in the same file.
 	def outputCampaign(output_filename, first)
 
@@ -741,18 +724,51 @@ class BingCampaign
 		end
 	end
 
+	def createAdGroup(name)
+		# Create ad group object
+		new_ad_group = BingAdGroup.new( name: name, 
+								  campaign: self)
+		@adgroups <<  new_ad_group
+		return new_ad_group
+	end
+
+	def createSitelink(link_text, desc_line_1, desc_line_2, destination_url, id, order_number)
+		@sitelinks << BingSitelink.new( campaign: self,
+									id: id,
+									desc_line_1: desc_line_1,
+									desc_line_2: desc_line_2,
+									destination_url: destination_url,
+									link_text: link_text,
+									order_number: order_number
+									)
+	end 
+
 	# Output the location row as an array.
-	def locationRow
+	def bidAdjustmentRow(adjustment_type, target, adjustment_in_percentage)
 		output_row = []
 
 		@output_row_headers.each do |header|
 			case header
+			when "Type"
+				# adjustment_type = "Campaign Location Target" for location
+				# adjustment_type = "Campaign DeviceOS Target" for device
+				output_row << adjustment_type
+			when "Status"
+				output_row << @status
 			when "Campaign"
 				output_row << @name
-			when "Location"
-				output_row << @location
-			when "ID"
-				output_row << "2840" # AdWords ID code for "United States" location
+			when "Target"
+				# target = "US" for United states location target
+				# target = "Smartphones" for DeviceOS Target to Mobile Phones
+				# target = "Tablets" for DeviceOS Target to Tablets
+				# target = "Computers" for DeviceOS Target to Computers
+				output_row << target
+			when "Physical Intent"
+				output_row << "PeopleInOrSearchingForOrViewingPages"
+			when "Bid Adjustment"
+				output_row << adjustment_in_percentage
+			when "Name"
+				output_row << "United States"
 			else
 				output_row << nil # Must be nil for CSV to be written properly.
 			end
