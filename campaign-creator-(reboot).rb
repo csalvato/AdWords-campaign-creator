@@ -180,7 +180,6 @@ class ModifiedBroadCityStateCampaignFactory < CampaignFactory
 	end
 
 	def create(seed, short_seed, niche, landingPage, area_of_study, concentration)
-		total_groups = (@locations.length.to_f / @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN).ceil
 
 		base_campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION +LOCATIONCODE} (search; modbroad)"
 
@@ -311,7 +310,6 @@ class ModifiedBroadCityCampaignFactory < CampaignFactory
 	end
 
 	def create(seed, short_seed, niche, landingPage, area_of_study, concentration)
-		total_groups = (@locations.length.to_f / @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN).ceil
 
 		base_campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION} (search; modbroad)"
 
