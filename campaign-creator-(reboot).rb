@@ -560,7 +560,7 @@ class Campaign
 			when "Location"
 				output_row << @location
 			when "ID"
-				output_row << "2840"
+				output_row << "2840" # AdWords ID code for "United States" location
 			else
 				output_row << nil # Must be nil for CSV to be written properly.
 			end
@@ -881,7 +881,7 @@ end
 campaigns = Array[]
 
 #Set Niche Parameters
-seeds_file_path = "seeds-for-next-import.csv"
+seeds_file_path = "seeds-for-test-import.csv"
 seeds = CSV.read(seeds_file_path, :headers => true, :encoding => 'windows-1251:utf-8')
 
 seeds.each do |seed_data|
