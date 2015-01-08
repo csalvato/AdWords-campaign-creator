@@ -27,6 +27,9 @@ class CampaignFactory
 		puts error_message
 		return error_message
 	end
+end
+
+class AdWordsCampaignFactory < CampaignFactory
 
 	def createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
 		sitelink_page_headline = "Looking for " + seed + "?"
@@ -170,7 +173,7 @@ class CampaignFactory
 end
 
 # Class representing a "Campaign Factory" that can make City/State Campaigns
-class ModifiedBroadCityStateCampaignFactory < CampaignFactory
+class ModifiedBroadCityStateAdWordsCampaignFactory < AdWordsCampaignFactory
 	def initialize(opts={})	
 		opts = {location_file_path: "location-data.csv"}.merge(opts)
 		# Read all locations from file and store as array of arrays
@@ -302,7 +305,7 @@ class ModifiedBroadCityStateCampaignFactory < CampaignFactory
 end
 
 # Class representing a "Campaign Factory" that can make City Campaigns
-class ModifiedBroadCityCampaignFactory < CampaignFactory
+class ModifiedBroadCityAdWordsCampaignFactory < AdWordsCampaignFactory
 	def initialize(opts={})	
 		opts = {location_file_path: "location-data.csv"}.merge(opts)
 		# Read all locations from file and store as array of arrays
@@ -405,6 +408,15 @@ class ModifiedBroadCityCampaignFactory < CampaignFactory
 		short_seed.gsub(" ","-") + ".koodlu.com/" + city.gsub(" ", "-"),
 		short_seed.gsub(" ","-") + ".koodlu.com"]
 	end
+end
+
+class BingCampaignFactory < CampaignFactory
+end
+
+class ModifiedBroadCityStateBingCampaignFactory < BingCampaignFactory
+end
+
+class ModifiedBroadCityBingCampaignFactory < BingCampaignFactory
 end
 
 
@@ -1403,13 +1415,13 @@ seeds.each do |seed_data|
 
 	# Create Campaign Factory to help with campaign creation
 	if createCityState
-		cityStateCampaignFactory = ModifiedBroadCityStateCampaignFactory.new(location_file_path: "city-state-location-data.csv")
+		cityStateCampaignFactory = ModifiedBroadCityStateAdWordsCampaignFactory.new(location_file_path: "city-state-location-data.csv")
 		campaigns.concat( cityStateCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
 		puts seed + " City/State Campaign Created"
 	end
 
 	if createCity
-		cityCampaignFactory = ModifiedBroadCityCampaignFactory.new(location_file_path: "city-location-data.csv")
+		cityCampaignFactory = ModifiedBroadCityAdWordsCampaignFactory.new(location_file_path: "city-location-data.csv")
 		campaigns.concat( cityCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
 		puts seed + " City Campaign Created"
 	end
