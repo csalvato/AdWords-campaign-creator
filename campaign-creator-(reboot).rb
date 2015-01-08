@@ -634,41 +634,41 @@ class BingCampaign
 				sitelinks: [],
 				adgroups: [] }.merge(opts)
 
-		@output_row_headers = [ "Type"
-								"ID"
-								"Status"
-								"Campaign"
-								"Budget"
-								"Budget Type"
-								"Ad Group"
-								"Keyword"
-								"Match Type"
-								"Bid"
-								"Title"
-								"Text"
-								"Display URL"
-								"Destination URL"
-								"Time Zone"
-								"Keyword Variant Match Type Enabled"
-								"Start Date"
-								"Search Network"
-								"Content Network"
-								"Network Distribution"
-								"Search Bid"
-								"Content Bid"
-								"Language"
-								"Ad Rotation"
-								"Pricing Model"
-								"Negative"
-								"Target"
-								"Physical Intent"
-								"Bid Adjustment"
-								"Sitelink Extension Order"
-								"Sitelink Extension Link Text"
-								"Sitelink Extension Destination URL"
-								"Sitelink Extension Description1"
-								"Sitelink Extension Description2"
-								"Name"
+		@output_row_headers = [ "Type",
+								"ID",
+								"Status",
+								"Campaign",
+								"Budget",
+								"Budget Type",
+								"Ad Group",
+								"Keyword",
+								"Match Type",
+								"Bid",
+								"Title",
+								"Text",
+								"Display URL",
+								"Destination URL",
+								"Time Zone",
+								"Keyword Variant Match Type Enabled",
+								"Start Date",
+								"Search Network",
+								"Content Network",
+								"Network Distribution",
+								"Search Bid",
+								"Content Bid",
+								"Language",
+								"Ad Rotation",
+								"Pricing Model",
+								"Negative",
+								"Target",
+								"Physical Intent",
+								"Bid Adjustment",
+								"Sitelink Extension Order",
+								"Sitelink Extension Link Text",
+								"Sitelink Extension Destination URL",
+								"Sitelink Extension Description1",
+								"Sitelink Extension Description2",
+								"Name",
 								"Device Preference"]
 	end
 
@@ -746,7 +746,7 @@ class BingCampaign
 			elsif adjustment_type == "Campaign DeviceOS Target"
 				device_adjustments = { 'Smartphones' => @mobile_bid_adjustment, 
 									   'Tablets' => @tablet_bid_adjustment, 
-									   'Computers' => @computers_bid_adjustment]
+									   'Computers' => @computers_bid_adjustment }
 				device_adjustments.each do |target, adjustment_in_percentage|
 					output_rows << bidAdjustmentRow(adjustment_type, target, adjustment_in_percentage)
 				end
@@ -882,7 +882,7 @@ class BingSitelink
 
 	def initialize( opts={} )
 		opts = {campaign: nil,
-				id: 0 
+				id: 0,
 				desc_line_1: "",
 				desc_line_2: "",
 				destination_url: "",
