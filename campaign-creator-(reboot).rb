@@ -57,7 +57,7 @@ class CampaignFactory
 							      	  short_seed,
 							      	  "Find " + niche + " Training",
 							      	  niche + " Training"]
-  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, 25 )
+  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, Sitelink::MAX_LINK_TEXT_LENGTH )
 		
 		sitelink_desc_line_1_options = ["Looking for " + seed + "?",
 										"Need " + seed + "?",
@@ -68,7 +68,7 @@ class CampaignFactory
 										"Looking for " + niche + "Classes?",
 										"Need " + niche + "?",
 										niche + " Classes?"]
-		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, 35 )
+		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, Sitelink::MAX_DESCRIPTION_LENGTH )
 
 		sitelink_desc_line_2_options = ["Find " + seed + " Now",
 										"Find " + short_seed + " Now",
@@ -76,7 +76,7 @@ class CampaignFactory
 										short_seed + " Now",
 										niche + " Training Now",
 										"Quick Training Finder"]
-		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, 35 )
+		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, Sitelink::MAX_DESCRIPTION_LENGTH )
 
 		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
@@ -89,7 +89,7 @@ class CampaignFactory
 							          niche + " Classes Finder",
 							      	  seed,
 							      	  short_seed + " Finder"]
-  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, 25 )
+  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, Sitelink::MAX_LINK_TEXT_LENGTH )
 		
 		sitelink_desc_line_1_options = ["Use our " + seed + " Finder",
 										"Use " + seed + " Finder",
@@ -97,7 +97,7 @@ class CampaignFactory
 										"Use " + short_seed + " Finder",
 										"Use " + niche + " Classes Finder",
 										"Use Our Classes Finder"]
-		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, 35 )
+		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, Sitelink::MAX_DESCRIPTION_LENGTH )
 
 		sitelink_desc_line_2_options = ["To Find " + seed + " Now",
 										"To Find " + seed,
@@ -106,7 +106,7 @@ class CampaignFactory
 										"To Find " + niche + " Classes Now",
 										"To Find " + niche + " Classes",
 										"To Find Classes Now"]
-		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, 35 )
+		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, Sitelink::MAX_DESCRIPTION_LENGTH )
 
 		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
@@ -114,10 +114,10 @@ class CampaignFactory
 
 	def createSitelink3(campaign, niche, seed, short_seed, sitelink_destination_url)
 		sitelink_link_text_options = ["Submit Your Info Online"]
-  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, 25 )
+  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, Sitelink::MAX_LINK_TEXT_LENGTH )
 		
 		sitelink_desc_line_1_options = ["Take 60 Seconds To Submit Your Info"]
-		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, 35 )
+		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, Sitelink::MAX_DESCRIPTION_LENGTH )
 
 		sitelink_desc_line_2_options = ["To Find " + seed + " Now",
 										"To Find " + seed,
@@ -126,7 +126,7 @@ class CampaignFactory
 										"To Find " + niche + " Classes Now",
 										"To Find " + niche + " Classes",
 										"To Find Classes Now"]
-		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, 35 )
+		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, Sitelink::MAX_DESCRIPTION_LENGTH )
 
 		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
@@ -134,14 +134,14 @@ class CampaignFactory
 
 	def createSitelink4(campaign, niche, seed, short_seed, sitelink_destination_url)
 		sitelink_link_text_options = ["Takes Less Than 1 Min"]
-  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, 25 )
+  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, Sitelink::MAX_LINK_TEXT_LENGTH )
 		
 		sitelink_desc_line_1_options = ["Find " + seed + " Fast",
 										"Find " + seed,
 										"Find " + short_seed + " Fast",
 										"Find " + short_seed,
 										"Find Classes Fast"]
-		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, 35 )
+		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, Sitelink::MAX_DESCRIPTION_LENGTH )
 
 		sitelink_desc_line_2_options = ["Using Our " + seed + " Search",
 										"Using " + seed + " Search",
@@ -152,17 +152,17 @@ class CampaignFactory
 										"Using Our " + niche + " Classes Search",
 										"Using " + niche + " Classes Search",
 										niche + " Classes Search"]
-		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, 35 )
+		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, Sitelink::MAX_DESCRIPTION_LENGTH )
 
 		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
 		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url)
 	end
 
 	def createAd(adgroup, headline_options, desc_line_1_options, desc_line_2_options, display_url_options, destination_url, device_preference)
-		headline = selectOptionOfLength( headline_options, 25 )
-		desc_line_1 = selectOptionOfLength( desc_line_1_options, 35 )
-		desc_line_2 = selectOptionOfLength( desc_line_2_options, 35 )
-		display_url = selectOptionOfLength( display_url_options, 35 )
+		headline = selectOptionOfLength( headline_options, Ad::MAX_AD_HEADLINE_LENGTH )
+		desc_line_1 = selectOptionOfLength( desc_line_1_options, Ad::MAX_AD_DESCRIPTION_LENGTH )
+		desc_line_2 = selectOptionOfLength( desc_line_2_options, Ad::MAX_AD_DESCRIPTION_LENGTH )
+		display_url = selectOptionOfLength( display_url_options, Ad::MAX_AD_DISPLAY_URL_LENGTH)
 		
 		adgroup.createAd(headline, desc_line_1, desc_line_2, display_url, destination_url, device_preference)
 	end
@@ -820,6 +820,10 @@ class BingCampaign
 end
 
 class Sitelink
+	MAX_LINK_TEXT_LENGTH = 25
+	MAX_DESCRIPTION_LENGTH = 35
+	MAX_DISPLAY_URL_LENGTH = 2048
+
 	def initialize( opts={} )
 		opts = {campaign: nil, 
 				desc_line_1: "",
@@ -1248,6 +1252,11 @@ end
 	# Methods:
 		# => outputSettingsRow (outputs the settings row for the Ad Group as ready for campaign import CSV)
 class Ad
+	MAX_AD_HEADLINE_LENGTH = 25
+	MAX_AD_DESCRIPTION_LENGTH = 35
+	MAX_AD_DISPLAY_URL_LENGTH = 35
+	MAX_AD_DESTINATION_URL_LENGTH = 1024
+
 	def initialize( opts={} )
 		opts = { campaign: nil,
 		  ad_group: nil,
