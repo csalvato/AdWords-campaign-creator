@@ -13,8 +13,6 @@ puts "Starting Script..."
 require 'csv'
 
 class CampaignFactory
-	@@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN = 20000
-
 	def initialize(opts={})	
 	end
 
@@ -184,12 +182,14 @@ class ModifiedBroadCityStateCampaignFactory < CampaignFactory
 		base_campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION +LOCATIONCODE} (search; modbroad)"
 
 		campaigns = Array[]
+		new_campaign = Campaign.new( name: base_campaign_name)
 		campaign_counter = 1
-		if @locations.length < @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN
-			campaigns << Campaign.new( name: base_campaign_name )
-		else
-			campaigns << Campaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s)
+		if @locations.length > Campaign::MAX_ADGROUPS_PER_CAMPAIGN
+			new_campaign.name =  base_campaign_name + " Group " + campaign_counter.to_s
 		end
+
+		campaigns << new_campaign 
+
 		current_campaign = campaigns.last
 		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
 
@@ -234,7 +234,7 @@ class ModifiedBroadCityStateCampaignFactory < CampaignFactory
 		
 
 			ad_group_count = index + 1
-			if ad_group_count % @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN == 0
+			if ad_group_count % Campaign::MAX_ADGROUPS_PER_CAMPAIGN == 0
 				campaign_counter += 1
 				campaigns << Campaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
 				current_campaign = campaigns.last
@@ -314,12 +314,14 @@ class ModifiedBroadCityCampaignFactory < CampaignFactory
 		base_campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION} (search; modbroad)"
 
 		campaigns = Array[]
+		new_campaign = Campaign.new( name: base_campaign_name)
 		campaign_counter = 1
-		if @locations.length < @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN
-			campaigns << Campaign.new( name: base_campaign_name )
-		else
-			campaigns << Campaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s)
+		if @locations.length > Campaign::MAX_ADGROUPS_PER_CAMPAIGN
+			new_campaign.name =  base_campaign_name + " Group " + campaign_counter.to_s
 		end
+
+		campaigns << new_campaign 
+
 		current_campaign = campaigns.last
 		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
 
@@ -357,7 +359,7 @@ class ModifiedBroadCityCampaignFactory < CampaignFactory
 			createAd(adgroup, headline_options, desc_line_1_options, desc_line_2_options, display_url_options, destination_url, device_preference)
 
 			ad_group_count = index + 1
-			if ad_group_count % @@ADWORDS_MAX_ADGROUPS_PER_CAMPAIGN == 0
+			if ad_group_count % Campaign::MAX_ADGROUPS_PER_CAMPAIGN == 0
 				campaign_counter += 1
 				campaigns << Campaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
 				current_campaign = campaigns.last
@@ -421,6 +423,7 @@ end
 		# => createAdGroup - creates ad group object for the campaign based on seed keywords
 class Campaign
 	attr_accessor :output_row_headers, :status, :name
+	MAX_ADGROUPS_PER_CAMPAIGN = 20000
 
 	def initialize(opts={})
 		opts = {name: "Default Name",
