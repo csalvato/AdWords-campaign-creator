@@ -650,43 +650,42 @@ class BingCampaign
 		@sitelinks = opts[:sitelinks]
 		@adgroups = opts[:adgroups]
 
-		@output_row_headers = [ "Campaign",
-								"Campaign Daily Budget",
-								"Campaign Type",
-								"Networks",
-								"Languages",
-								"Location",
-								"Ad Group",
-								"Max CPC",
-								"Display Network Max CPC",
-								"Max CPM",
-								"CPA Bid",
-								"Display Network Custom Bid Type",
-								"Ad Group Type",
-								"Flexible Reach",
-								"Keyword",
-								"ID",
-								"Criterion Type",
-								"Bid Strategy Type",
-								"Bid Strategy Name",
-								"Enhanced CPC",
-								"Viewable CPM",
-								"Bid Modifier",
-								"Link Text",
-								"Headline",
-								"Description Line 1",
-								"Description Line 2",
-								"App ID / Package name",
-								"Display URL",
-								"Destination URL",
-								"Platform Targeting",
-								"Device Preference",
-								"Start Date",
-								"End Date",
-								"Ad Schedule",
-								"Campaign Status",
-								"AdGroup Status",
-								"Status"]
+		@output_row_headers = [ "Type"
+								"ID"
+								"Status"
+								"Campaign"
+								"Budget"
+								"Budget Type"
+								"Ad Group"
+								"Keyword"
+								"Match Type"
+								"Bid"
+								"Title"
+								"Text"
+								"Display URL"
+								"Destination URL"
+								"Time Zone"
+								"Keyword Variant Match Type Enabled"
+								"Start Date"
+								"Search Network"
+								"Content Network"
+								"Network Distribution"
+								"Search Bid"
+								"Content Bid"
+								"Language"
+								"Ad Rotation"
+								"Pricing Model"
+								"Negative"
+								"Target"
+								"Physical Intent"
+								"Bid Adjustment"
+								"Sitelink Extension Order"
+								"Sitelink Extension Link Text"
+								"Sitelink Extension Destination URL"
+								"Sitelink Extension Description1"
+								"Sitelink Extension Description2"
+								"Name"
+								"Device Preference"]
 	end
 
 	# Set first to true if it is the first campaign in a set of campaigns that need to be in the same file.
@@ -742,6 +741,31 @@ class BingCampaign
 									order_number: order_number
 									)
 	end 
+
+	# Output the location row as an array.
+	def bidAdjustmentRows
+		output_rows = []
+
+		adjustment_types = ["Campaign Location Target", "Campaign DeviceOS Target"]
+		
+		adjustment_types.each do |adjustment_type|
+
+			if adjustment_type == "Campaign Location Target"
+				target = "US"
+				adjustment_in_percentage = 0
+				output_rows << bidAdjustmentRow(adjustment_type, target, adjustment_in_percentage)
+			elsif adjustment_type == "Campaign DeviceOS Target"
+				device_adjustments = { 'Smartphones' => @mobile_bid_adjustment, 
+									   'Tablets' => @tablet_bid_adjustment, 
+									   'Computers' => @computers_bid_adjustment]
+				device_adjustments.each do |target, adjustment_in_percentage|
+					output_rows << bidAdjustmentRow(adjustment_type, target, adjustment_in_percentage)
+				end
+			end
+		end
+		
+		output_row
+	end
 
 	# Output the location row as an array.
 	def bidAdjustmentRow(adjustment_type, target, adjustment_in_percentage)
