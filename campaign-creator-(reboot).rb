@@ -633,22 +633,6 @@ class BingCampaign
 				status: "Active",
 				sitelinks: [],
 				adgroups: [] }.merge(opts)
-		@name = opts[:name]
-		@budget = opts[:budget]
-		@networks = opts[:networks]
-		@languages = opts[:languages]
-		@bid_strategy_type = opts[:bid_strategy_type]
-		@enhanced_cpc = opts[:enhanced_cpc]
-		@viewable_cpm = opts[:viewable_cpm]
-		@bid_modifier = opts[:bid_modifier]
-		@start_date = opts[:start_date]
-		@end_date = opts[:end_date]
-		@ad_schedule = opts[:ad_schedule]
-		@location = opts[:location]
-		@campaign_status = opts[:campaign_status]
-		@status = opts[:status]
-		@sitelinks = opts[:sitelinks]
-		@adgroups = opts[:adgroups]
 
 		@output_row_headers = [ "Type"
 								"ID"
@@ -702,7 +686,10 @@ class BingCampaign
 
 			# Output location row (this must be it's own row for 
 			# Mobile Bid adjustment to work in campaign settings row)
-			csv << self.locationRow
+			bid_adjustment_rows = self.bidAdjustmentRows
+			bid_adjustment_rows.each do |bid_adjustment_row|
+				csv << bid_adjustment_row
+			end
 
 			# Output All AdGroups Settings Rows
 			@adgroups.each do |adgroup|
@@ -716,7 +703,9 @@ class BingCampaign
 			end
 
 			# Output All Sitelinks Settings Rows
-			@sitelinks.each do |sitelink|
+			@sitelinks.each_with_index do |sitelink, index|
+				sitelink.formatVersionRow if index == 0 # Required row by bing to make sure sitelinks work
+				sitelink.sharedSettingRow if index == 0 # Required row by bing to tie sitelinks to a campaign
 				csv << sitelink.settingsRow
 			end
 
