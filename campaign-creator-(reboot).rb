@@ -614,10 +614,11 @@ end
 class BingCampaign
 	attr_accessor :output_row_headers, :name
 	MAX_ADGROUPS_PER_CAMPAIGN = 20000
+	TYPE_STRING = "Campaign"
 
 	def initialize(opts={})
 		opts = {name: "Default Name",
-				daily_budget: "10",
+				budget: "10",
 				networks: "Search Partners",
 				languages: "en",
 				bid_strategy_type: "Manual CPC",
@@ -633,7 +634,7 @@ class BingCampaign
 				sitelinks: [],
 				adgroups: [] }.merge(opts)
 		@name = opts[:name]
-		@daily_budget = opts[:daily_budget]
+		@budget = opts[:budget]
 		@networks = opts[:networks]
 		@languages = opts[:languages]
 		@bid_strategy_type = opts[:bid_strategy_type]
@@ -766,32 +767,20 @@ class BingCampaign
 		
 		@output_row_headers.each do |header|
 			case header
-			when "Campaign"
-				output_row << @name
-			when "Campaign Daily Budget"
-				output_row << @daily_budget
-			when "Languages"
-				output_row << @languages
-			when "Networks"
-				output_row << @networks 
+			when "Type"
+				output_row << TYPE_STRING
 			when "Status"
 				output_row << @status
-			when "Bid Strategy Type"
-				output_row << @bid_strategy_type				
-			when "Enhanced CPC"
-				output_row << @enhanced_cpc
-			when "Viewable CPM"
-				output_row << @viewable_cpm
-			when "Bid Modifier"
-				output_row << @bid_modifier
-			when "Start Date"
-				output_row << @start_date
-			when "End Date"
-				output_row << @end_date
-			when "Ad Schedule"
-				output_row << @ad_schedule
-			when "Campaign Status"
-				output_row << @campaign_status
+			when "Campaign"
+				output_row << @name
+			when "Budget"
+				output_row << @budget 
+			when "Budget Type"
+				output_row << "DailyBudgetAccelerated"
+			when "Time Zone"
+				output_row << "PacificTimeUSCanadaTijuana"				
+			when "Keyword Variant Match Type Enabled"
+				output_row << "TRUE"
 			else
 				output_row << nil # Must be nil for CSV to be written properly.
 			end
