@@ -1768,7 +1768,7 @@ adwordsCampaigns = Array[]
 bingCampaigns = []
 
 #Set Niche Parameters
-seeds_file_path = "seeds-for-test-import.csv"
+seeds_file_path = "seeds-for-next-import.csv"
 seeds = CSV.read(seeds_file_path, :headers => true, :encoding => 'windows-1251:utf-8')
 
 seeds.each_with_index do |seed_data, index|
