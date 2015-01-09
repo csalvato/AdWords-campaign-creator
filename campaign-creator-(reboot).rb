@@ -33,7 +33,7 @@ class AdWordsCampaignFactory < CampaignFactory
 
 	def createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
 		sitelink_page_headline = "Looking for " + seed + "?"
-		sitelink_utm_campaign = "_src*adwords_d*{ifmobile:mb}{ifnotmobile:dt}_k*{keyword}_m*{matchtype}_c*{creative}_p*{adposition}_n*{network}"
+		sitelink_utm_campaign = "_src*adwords-sitelink_d*{ifmobile:mb}{ifnotmobile:dt}_k*{keyword}_m*{matchtype}_c*{creative}_p*{adposition}_n*{network}"
 		sitelink_destination_url = "http://koodlu.com/#{landingPage}/" +
 									"?area_of_study=#{area_of_study}" + 
 									"&concentration=#{concentration}" +
@@ -421,7 +421,7 @@ class BingCampaignFactory < CampaignFactory
 
 	def createCampaignSitelinks(campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, sitelink_id)
 		sitelink_page_headline = "Looking for " + seed + "?"
-		sitelink_utm_campaign = "_src*BingAds_d*dt_d2*{IfMobile:mb}{IfNotMobile:dt}_k*{QueryString}_m*{MatchType}_c*{AdId}_p*{adposition}_n*{IfSearch:b}{IfContent:d}"
+		sitelink_utm_campaign = "_src*BingAds-sitelink_d*dt_d2*{IfMobile:mb}{IfNotMobile:dt}_k*{QueryString}_m*{MatchType}_c*{AdId}_p*{adposition}_n*{IfSearch:b}{IfContent:d}"
 		sitelink_destination_url = "http://koodlu.com/#{landingPage}/" +
 									"?area_of_study=#{area_of_study}" + 
 									"&concentration=#{concentration}" +
@@ -574,7 +574,7 @@ class ModifiedBroadCityStateBingCampaignFactory < BingCampaignFactory
 		campaigns << new_campaign 
 
 		current_campaign = campaigns.last
-		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, campaign_counter)
+		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, @id_for_sitelinks + campaign_counter)
 
 
 		@locations.each_with_index do |row, index|
@@ -618,7 +618,7 @@ class ModifiedBroadCityStateBingCampaignFactory < BingCampaignFactory
 				campaign_counter += 1
 				campaigns << BingCampaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
 				current_campaign = campaigns.last
-				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, @id_for_sitelinks)
+				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, @id_for_sitelinks + campaign_counter)
 			end
 		end
 		return campaigns
@@ -704,7 +704,7 @@ class ModifiedBroadCityBingCampaignFactory < BingCampaignFactory
 		campaigns << new_campaign 
 
 		current_campaign = campaigns.last
-		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, campaign_counter)
+		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, @id_for_sitelinks + campaign_counter)
 
 
 		@locations.each_with_index do |row, index|
@@ -743,7 +743,7 @@ class ModifiedBroadCityBingCampaignFactory < BingCampaignFactory
 				campaign_counter += 1
 				campaigns << BingCampaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
 				current_campaign = campaigns.last
-				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, @id_for_sitelinks)
+				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, @id_for_sitelinks + campaign_counter)
 			end
 		end
 		return campaigns
