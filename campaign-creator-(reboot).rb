@@ -411,12 +411,258 @@ class ModifiedBroadCityAdWordsCampaignFactory < AdWordsCampaignFactory
 end
 
 class BingCampaignFactory < CampaignFactory
+	def createCampaignSitelinks(campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
+		sitelink_page_headline = "Looking for " + seed + "?"
+		sitelink_utm_campaign = "_src*BingAds_d*{ifmobile:mb}{ifnotmobile:dt}_k*{keyword}_m*{matchtype}_c*{creative}_p*{adposition}_n*{network}"
+		sitelink_destination_url = "http://koodlu.com/#{landingPage}/" +
+									"?area_of_study=#{area_of_study}" + 
+									"&concentration=#{concentration}" +
+									"&seed=#{seed.gsub(" ", "%20")}" +
+									"&headline=#{sitelink_page_headline.gsub(" ","%20").gsub("?","%3f")}" +
+									"&utm_campaign=#{sitelink_utm_campaign}" +
+									"&utm_source=Google" +
+									"&utm_medium=cpc"
+
+		createSitelink1(campaign, niche, seed, short_seed, sitelink_destination_url)
+		createSitelink2(campaign, niche, seed, short_seed, sitelink_destination_url)
+		createSitelink3(campaign, niche, seed, short_seed, sitelink_destination_url)
+		createSitelink4(campaign, niche, seed, short_seed, sitelink_destination_url)
+	end
+
+	def createSitelink1(campaign, niche, seed, short_seed, sitelink_destination_url)
+		sitelink_link_text_options = ["Find " + seed + " Near You",
+							  		  seed + " Near You",
+							          "Find " + seed,
+							      	  seed,
+							      	  "Find " + short_seed + " Near You",
+							  		  short_seed + " Near You",
+							          "Find " + short_seed,
+							      	  short_seed,
+							      	  "Find " + niche + " Training",
+							      	  niche + " Training"]
+  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, BingSitelink::MAX_LINK_TEXT_LENGTH )
+		
+		sitelink_desc_line_1_options = ["Looking for " + seed + "?",
+										"Need " + seed + "?",
+										seed + "?",
+										"Looking for " + short_seed + "?",
+										"Need " + short_seed + "?",
+										short_seed + "?",
+										"Looking for " + niche + "Classes?",
+										"Need " + niche + "?",
+										niche + " Classes?"]
+		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
+
+		sitelink_desc_line_2_options = ["Find " + seed + " Now",
+										"Find " + short_seed + " Now",
+										seed + " Now",
+										short_seed + " Now",
+										niche + " Training Now",
+										"Quick Training Finder"]
+		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
+
+		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
+		campaign.createBingSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 1)
+	end
+
+	def createSitelink2(campaign, niche, seed, short_seed, sitelink_destination_url)
+		sitelink_link_text_options = ["Quick " + seed + " Finder",
+							  		  seed + " Finder",
+							  		  "Quick" + short_seed + " Finder",
+							          niche + " Classes Finder",
+							      	  seed,
+							      	  short_seed + " Finder"]
+  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, BingSitelink::MAX_LINK_TEXT_LENGTH )
+		
+		sitelink_desc_line_1_options = ["Use our " + seed + " Finder",
+										"Use " + seed + " Finder",
+										"Use our " + short_seed + " Finder",
+										"Use " + short_seed + " Finder",
+										"Use " + niche + " Classes Finder",
+										"Use Our Classes Finder"]
+		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
+
+		sitelink_desc_line_2_options = ["To Find " + seed + " Now",
+										"To Find " + seed,
+										"To Find " + short_seed + " Now",
+										"To Find " + seed,
+										"To Find " + niche + " Classes Now",
+										"To Find " + niche + " Classes",
+										"To Find Classes Now"]
+		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
+
+		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 2)
+	end
+
+	def createSitelink3(campaign, niche, seed, short_seed, sitelink_destination_url)
+		sitelink_link_text_options = ["Submit Your Info Online"]
+  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, BingSitelink::MAX_LINK_TEXT_LENGTH )
+		
+		sitelink_desc_line_1_options = ["Take 60 Seconds To Submit Your Info"]
+		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
+
+		sitelink_desc_line_2_options = ["To Find " + seed + " Now",
+										"To Find " + seed,
+										"To Find " + short_seed + " Now",
+										"To Find " + seed,
+										"To Find " + niche + " Classes Now",
+										"To Find " + niche + " Classes",
+										"To Find Classes Now"]
+		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
+
+		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 3)
+	end
+
+	def createSitelink4(campaign, niche, seed, short_seed, sitelink_destination_url)
+		sitelink_link_text_options = ["Takes Less Than 1 Min"]
+  	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, BingSitelink::MAX_LINK_TEXT_LENGTH )
+		
+		sitelink_desc_line_1_options = ["Find " + seed + " Fast",
+										"Find " + seed,
+										"Find " + short_seed + " Fast",
+										"Find " + short_seed,
+										"Find Classes Fast"]
+		sitelink_desc_line_1 = selectOptionOfLength( sitelink_desc_line_1_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
+
+		sitelink_desc_line_2_options = ["Using Our " + seed + " Search",
+										"Using " + seed + " Search",
+										seed + " Search",
+										"Using Our " + short_seed + " Search",
+										"Using " + short_seed + " Search",
+										short_seed + " Search",
+										"Using Our " + niche + " Classes Search",
+										"Using " + niche + " Classes Search",
+										niche + " Classes Search"]
+		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
+
+		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 4)
+	end
+
+	def createAd(adgroup, title_options, text_options, display_url_options, destination_url, device_preference)
+
+		headline = selectOptionOfLength( headline_options, BingAd::MAX_AD_TITLE_LENGTH )
+		text = selectOptionOfLength( text_options, BingAd::MAX_AD_TEXT_LENGTH )
+		display_url = selectOptionOfLength( display_url_options, BingAd::MAX_AD_DISPLAY_URL_LENGTH)
+		
+		adgroup.createAd(title, text, display_url, destination_url, device_preference)
+	end
 end
 
 class ModifiedBroadCityStateBingCampaignFactory < BingCampaignFactory
 end
 
 class ModifiedBroadCityBingCampaignFactory < BingCampaignFactory
+	def initialize(opts={})	
+		opts = {location_file_path: "location-data.csv"}.merge(opts)
+		# Read all locations from file and store as array of arrays
+		@locations = CSV.read(opts[:location_file_path], :headers => true, :encoding => 'windows-1251:utf-8')
+	end
+
+	def create(seed, short_seed, niche, landingPage, area_of_study, concentration)
+
+		base_campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION} (search; modbroad)"
+
+		campaigns = Array[]
+		new_campaign = BingCampaign.new( name: base_campaign_name)
+		campaign_counter = 1
+		if @locations.length > BingCampaign::MAX_ADGROUPS_PER_CAMPAIGN
+			new_campaign.name =  base_campaign_name + " Group " + campaign_counter.to_s
+		end
+
+		campaigns << new_campaign 
+
+		current_campaign = campaigns.last
+		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
+
+
+		@locations.each_with_index do |row, index|
+			# Set some initial variables
+			city = row["City"]
+
+			sublocation = city
+
+			page_headline = "Looking for " + seed + " in " + city + "?"
+
+			ad_group_name = seed + " in " + city
+			adgroup = current_campaign.createAdGroup(ad_group_name)
+
+			keywordString = "+" + (seed + " " + city).gsub(" ", " +")
+			adgroup.createKeyword(keywordString)
+
+
+			utm_campaign = "_src*BingAds_d*{ifmobile:mb}{ifnotmobile:dt}_k*{keyword}_m*{matchtype}_c*{creative}_p*{adposition}_n*{network}"
+			destination_url = "http://koodlu.com/#{landingPage}/" +
+							  "?area_of_study=#{area_of_study}" +
+							  "&concentration=#{concentration}" + 
+							  "&seed=#{seed.gsub(" ", "%20")}" + 
+							  "&location=#{sublocation.gsub(" ","%20")}" +
+							  "&headline=#{page_headline.gsub(" ","%20")}" + 
+							  "&utm_campaign=#{utm_campaign}" + 
+							  "&utm_source=Google" + 
+							  "&utm_medium=cpc"
+			title_options = createHeadlineOptions( niche, seed, short_seed, city )
+			text_options = createTextOptions( niche, seed, short_seed, city )
+			display_url_options = createDisplayURLOptions( niche, seed, short_seed, city )
+			device_preference = "All"
+			createAd(adgroup, title_options, text_options, display_url_options, destination_url, device_preference)
+
+			ad_group_count = index + 1
+			if ad_group_count % BingCampaign::MAX_ADGROUPS_PER_CAMPAIGN == 0
+				campaign_counter += 1
+				campaigns << BingCampaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
+				current_campaign = campaigns.last
+				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
+			end
+		end
+		return campaigns
+	end
+
+	def createHeadlineOptions( niche, seed, short_seed, city )
+		[seed + " " + city,
+		seed,
+		short_seed + " " + city,
+		short_seed,
+		niche + " Classes " + city,
+		niche + " " + city]
+	end
+
+	def createTextOptions( niche, seed, short_seed, city )
+		desc_line_1 = [city + " " + seed + "?",
+		city + " " + short_seed + "?",
+		seed + "?",
+		niche + " Classes?",
+		short_seed + "?",
+		seed,
+		short_seed]
+
+		desc_line_2 = ["Find " + city + " " + seed,
+		"Find " + seed,
+		seed,
+		"Find " + city + " " + short_seed,
+		"Find " + short_seed,
+		short_seed]
+
+		options = []
+		desc_line_1.each do |line_1|
+			desc_line_2.each do |line_2|
+				options << line_1 + " " + line_2
+			end
+		end
+
+		options
+	end
+
+	def createDisplayURLOptions( niche, seed, short_seed, city )
+		[ seed.gsub(" ","-") + ".koodlu.com/" + city.gsub(" ", "-"),
+		seed.gsub(" ","-") + ".koodlu.com",
+		niche.gsub(" ","-") + ".koodlu.com/" + city.gsub(" ", "-"),
+		niche.gsub(" ","-") + ".koodlu.com",
+		short_seed.gsub(" ","-") + ".koodlu.com/" + city.gsub(" ", "-"),
+		short_seed.gsub(" ","-") + ".koodlu.com"]
+	end
 end
 
 
@@ -895,6 +1141,9 @@ end
 class BingSitelink
 	TYPE_STRING_CAMPAIGN_SITELINK = "Campaign Sitelink Ad Extension"
 	TYPE_STRING_SITELINK = "Sitelink Ad Extension"
+	MAX_LINK_TEXT_LENGTH = 25
+	MAX_DESCRIPTION_LENGTH = 35
+	MAX_DISPLAY_URL_LENGTH = 1024
 
 	def initialize( opts={} )
 		opts = {campaign: nil,
@@ -1386,7 +1635,8 @@ class BingAd
 end
 
 # Create array to hold all the campaigns once generation is completed
-campaigns = Array[]
+adwordsCampaigns = Array[]
+bingCampaigns = []
 
 #Set Niche Parameters
 seeds_file_path = "seeds-for-test-import.csv"
@@ -1412,29 +1662,63 @@ seeds.each do |seed_data|
 		createCity = true
 	end
 
+	if seed_data["Create Bing City State?"].to_s.strip.length == 0 #Checks if nil, empty, or whitespace
+		createBingCityState = false
+	else
+		createBingCityState = true
+	end
+	
+	if seed_data["Create Bing City?"].to_s.strip.length == 0 #Checks if nil, empty, or whitespace
+		createBingCity = false
+	else
+		createBingCity = true
+	end
+
 
 	# Create Campaign Factory to help with campaign creation
 	if createCityState
 		cityStateCampaignFactory = ModifiedBroadCityStateAdWordsCampaignFactory.new(location_file_path: "city-state-location-data.csv")
-		campaigns.concat( cityStateCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
-		puts seed + " City/State Campaign Created"
+		adwordsCampaigns.concat( cityStateCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
+		puts seed + " Adwords City/State Campaign Created"
 	end
 
 	if createCity
 		cityCampaignFactory = ModifiedBroadCityAdWordsCampaignFactory.new(location_file_path: "city-location-data.csv")
-		campaigns.concat( cityCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
-		puts seed + " City Campaign Created"
+		adwordsCampaigns.concat( cityCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
+		puts seed + " Adwords City Campaign Created"
+	end
+
+	# Create Campaign Factory to help with campaign creation
+	if createBingCityState
+		cityStateCampaignFactory = ModifiedBroadCityStateBingCampaignFactory.new(location_file_path: "city-state-location-data.csv")
+		bingCampaigns.concat( cityStateCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
+		puts seed + " Bing City/State Campaign Created"
+	end
+
+	if createBingCity
+		cityCampaignFactory = ModifiedBroadCityBingCampaignFactory.new(location_file_path: "city-location-data.csv")
+		bingCampaigns.concat( cityCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
+		puts seed + " Bing City Campaign Created"
 	end
 end
 
 #Output the campaigns as a CSV
-output_filename = "campaign-for-import.csv"
+output_filename = "adwords-campaigns-for-import.csv"
 first = true
-campaigns.each_with_index do |campaign, index|
+adWordscampaigns.each_with_index do |campaign, index|
 	first = false if index > 0
-	campaign.outputCampaign(output_filename, first)
+	ampaign.outputCampaign(output_filename, first)
 	puts "Finished writing CSV for " + campaign.name
 end
+
+output_filename = "bing-campaigns-for-import.csv"
+first = true
+bing-campaigns.each_with_index do |campaign, index|
+	first = false if index > 0
+	ampaign.outputCampaign(output_filename, first)
+	puts "Finished writing CSV for " + campaign.name
+end
+
 
 puts "Script Complete!"
 puts "Time elapsed: #{Time.now - start_time} seconds"
