@@ -462,7 +462,7 @@ class BingCampaignFactory < CampaignFactory
 		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
 
 		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
-		campaign.createBingSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 1)
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 1, 1)
 	end
 
 	def createSitelink2(campaign, niche, seed, short_seed, sitelink_destination_url)
@@ -492,7 +492,7 @@ class BingCampaignFactory < CampaignFactory
 		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
 
 		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
-		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 2)
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 1, 2)
 	end
 
 	def createSitelink3(campaign, niche, seed, short_seed, sitelink_destination_url)
@@ -512,7 +512,7 @@ class BingCampaignFactory < CampaignFactory
 		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
 
 		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
-		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 3)
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 1, 3)
 	end
 
 	def createSitelink4(campaign, niche, seed, short_seed, sitelink_destination_url)
@@ -538,12 +538,12 @@ class BingCampaignFactory < CampaignFactory
 		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
 
 		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
-		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 4)
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 1, 4)
 	end
 
 	def createAd(adgroup, title_options, text_options, display_url_options, destination_url, device_preference)
 
-		headline = selectOptionOfLength( headline_options, BingAd::MAX_AD_TITLE_LENGTH )
+		title = selectOptionOfLength( title_options, BingAd::MAX_AD_TITLE_LENGTH )
 		text = selectOptionOfLength( text_options, BingAd::MAX_AD_TEXT_LENGTH )
 		display_url = selectOptionOfLength( display_url_options, BingAd::MAX_AD_DISPLAY_URL_LENGTH)
 		
@@ -877,20 +877,21 @@ class BingCampaign
 	def initialize(opts={})
 		opts = {name: "Default Name",
 				budget: "10",
-				networks: "Search Partners",
-				languages: "en",
-				bid_strategy_type: "Manual CPC",
-				enhanced_cpc: "Disabled",
-				viewable_cpm: "Disabled",
-				bid_modifier: "-100",
-				start_date: Time.now.strftime("%m-%d-%Y"),
-				end_date: "[]",
-				ad_schedule: "[]",
-				location: "United States",
-				campaign_status: "Active",
+				mobile_bid_adjustment: 0,
+				tablet_bid_adjustment: 0,
+				computers_bid_adjustment: 0,
 				status: "Active",
 				sitelinks: [],
 				adgroups: [] }.merge(opts)
+
+		@name = opts[:name]
+		@budget = opts[:budget]
+		@status = opts[:status]
+		@sitelinks = opts[:sitelinks]
+		@adgroups = opts[:adgroups]
+		@mobile_bid_adjustment = opts[:mobile_bid_adjustment] 
+		@tablet_bid_adjustment = opts[:tablet_bid_adjustment]
+		@computers_bid_adjustment = opts[:computers_bid_adjustment]
 
 		@output_row_headers = [ "Type",
 								"ID",
@@ -962,8 +963,8 @@ class BingCampaign
 
 			# Output All Sitelinks Settings Rows
 			@sitelinks.each_with_index do |sitelink, index|
-				sitelink.formatVersionRow if index == 0 # Required row by bing to make sure sitelinks work
-				sitelink.sharedSettingRow if index == 0 # Required row by bing to tie sitelinks to a campaign
+				csv << sitelink.formatVersionRow if index == 0 # Required row by bing to make sure sitelinks work
+				csv << sitelink.sharedSettingRow if index == 0 # Required row by bing to tie sitelinks to a campaign
 				csv << sitelink.settingsRow
 			end
 
@@ -985,8 +986,7 @@ class BingCampaign
 									desc_line_2: desc_line_2,
 									destination_url: destination_url,
 									link_text: link_text,
-									order_number: order_number
-									)
+									order_number: order_number )
 	end 
 
 	# Output the location row as an array.
@@ -1011,7 +1011,7 @@ class BingCampaign
 			end
 		end
 		
-		output_row
+		output_rows
 	end
 
 	# Output the location row as an array.
@@ -1579,8 +1579,8 @@ class BingAd
 	# Max Field Lengths (in characters)
 	MAX_AD_TITLE_LENGTH = 25
 	MAX_AD_TEXT_LENGTH = 71
-	MAX_DISPLAY_URL_LENGTH = 35
-	MAX_DESTINATION_URL_LENGTH = 1024
+	MAX_AD_DISPLAY_URL_LENGTH = 35
+	MAX_AD_DESTINATION_URL_LENGTH = 1024
 	TYPE_STRING = "Text Ad"
 
 	def initialize( opts={} )
@@ -1705,17 +1705,17 @@ end
 #Output the campaigns as a CSV
 output_filename = "adwords-campaigns-for-import.csv"
 first = true
-adWordscampaigns.each_with_index do |campaign, index|
+adwordsCampaigns.each_with_index do |campaign, index|
 	first = false if index > 0
-	ampaign.outputCampaign(output_filename, first)
+	campaign.outputCampaign(output_filename, first)
 	puts "Finished writing CSV for " + campaign.name
 end
 
 output_filename = "bing-campaigns-for-import.csv"
 first = true
-bing-campaigns.each_with_index do |campaign, index|
+bingCampaigns.each_with_index do |campaign, index|
 	first = false if index > 0
-	ampaign.outputCampaign(output_filename, first)
+	campaign.outputCampaign(output_filename, first)
 	puts "Finished writing CSV for " + campaign.name
 end
 
