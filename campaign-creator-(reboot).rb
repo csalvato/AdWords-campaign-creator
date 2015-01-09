@@ -411,7 +411,7 @@ class ModifiedBroadCityAdWordsCampaignFactory < AdWordsCampaignFactory
 end
 
 class BingCampaignFactory < CampaignFactory
-	def createCampaignSitelinks(campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
+	def createCampaignSitelinks(campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, sitelinks_id)
 		sitelink_page_headline = "Looking for " + seed + "?"
 		sitelink_utm_campaign = "_src*BingAds_d*{ifmobile:mb}{ifnotmobile:dt}_k*{keyword}_m*{matchtype}_c*{creative}_p*{adposition}_n*{network}"
 		sitelink_destination_url = "http://koodlu.com/#{landingPage}/" +
@@ -423,13 +423,13 @@ class BingCampaignFactory < CampaignFactory
 									"&utm_source=Google" +
 									"&utm_medium=cpc"
 
-		createSitelink1(campaign, niche, seed, short_seed, sitelink_destination_url)
-		createSitelink2(campaign, niche, seed, short_seed, sitelink_destination_url)
-		createSitelink3(campaign, niche, seed, short_seed, sitelink_destination_url)
-		createSitelink4(campaign, niche, seed, short_seed, sitelink_destination_url)
+		createSitelink1(campaign, niche, seed, short_seed, sitelink_destination_url, sitelink_id)
+		createSitelink2(campaign, niche, seed, short_seed, sitelink_destination_url, sitelink_id)
+		createSitelink3(campaign, niche, seed, short_seed, sitelink_destination_url, sitelink_id)
+		createSitelink4(campaign, niche, seed, short_seed, sitelink_destination_url, sitelink_id)
 	end
 
-	def createSitelink1(campaign, niche, seed, short_seed, sitelink_destination_url)
+	def createSitelink1(campaign, niche, seed, short_seed, sitelink_destination_url, sitelink_id)
 		sitelink_link_text_options = ["Find " + seed + " Near You",
 							  		  seed + " Near You",
 							          "Find " + seed,
@@ -462,10 +462,10 @@ class BingCampaignFactory < CampaignFactory
 		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
 
 		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
-		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 1, 1)
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, sitelink_id, 1)
 	end
 
-	def createSitelink2(campaign, niche, seed, short_seed, sitelink_destination_url)
+	def createSitelink2(campaign, niche, seed, short_seed, sitelink_destination_url, sitelink_id)
 		sitelink_link_text_options = ["Quick " + seed + " Finder",
 							  		  seed + " Finder",
 							  		  "Quick" + short_seed + " Finder",
@@ -492,10 +492,10 @@ class BingCampaignFactory < CampaignFactory
 		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
 
 		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
-		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 1, 2)
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, sitelink_id, 2)
 	end
 
-	def createSitelink3(campaign, niche, seed, short_seed, sitelink_destination_url)
+	def createSitelink3(campaign, niche, seed, short_seed, sitelink_destination_url, sitelink_id)
 		sitelink_link_text_options = ["Submit Your Info Online"]
   	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, BingSitelink::MAX_LINK_TEXT_LENGTH )
 		
@@ -512,10 +512,10 @@ class BingCampaignFactory < CampaignFactory
 		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
 
 		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
-		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 1, 3)
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, sitelink_id, 3)
 	end
 
-	def createSitelink4(campaign, niche, seed, short_seed, sitelink_destination_url)
+	def createSitelink4(campaign, niche, seed, short_seed, sitelink_destination_url, sitelink_id)
 		sitelink_link_text_options = ["Takes Less Than 1 Min"]
   	    sitelink_link_text = selectOptionOfLength( sitelink_link_text_options, BingSitelink::MAX_LINK_TEXT_LENGTH )
 		
@@ -538,7 +538,7 @@ class BingCampaignFactory < CampaignFactory
 		sitelink_desc_line_2 = selectOptionOfLength( sitelink_desc_line_2_options, BingSitelink::MAX_DESCRIPTION_LENGTH )
 
 		url = sitelink_destination_url + "&sitelink-text=#{sitelink_link_text.gsub(" ","-")}"
-		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, 1, 4)
+		campaign.createSitelink(sitelink_link_text, sitelink_desc_line_1, sitelink_desc_line_2, url, sitelink_id, 4)
 	end
 
 	def createAd(adgroup, title_options, text_options, display_url_options, destination_url, device_preference)
@@ -575,7 +575,7 @@ class ModifiedBroadCityBingCampaignFactory < BingCampaignFactory
 		campaigns << new_campaign 
 
 		current_campaign = campaigns.last
-		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
+		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, campaign_counter)
 
 
 		@locations.each_with_index do |row, index|
@@ -614,7 +614,7 @@ class ModifiedBroadCityBingCampaignFactory < BingCampaignFactory
 				campaign_counter += 1
 				campaigns << BingCampaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
 				current_campaign = campaigns.last
-				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
+				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, campaign_counter)
 			end
 		end
 		return campaigns
