@@ -88,7 +88,7 @@ class AdWordsCampaignFactory < CampaignFactory
 	def createSitelink2(campaign, niche, seed, short_seed, sitelink_destination_url)
 		sitelink_link_text_options = ["Quick " + seed + " Finder",
 							  		  seed + " Finder",
-							  		  "Quick" + short_seed + " Finder",
+							  		  "Quick " + short_seed + " Finder",
 							          niche + " Classes Finder",
 							      	  seed,
 							      	  short_seed + " Finder"]
@@ -412,11 +412,10 @@ end
 
 class BingCampaignFactory < CampaignFactory
 	def initialize(opts={})	
-		opts = {location_file_path: "location-data.csv",
-			    id_for_sitelinks: 0}.merge(opts)
+		opts = {location_file_path: "location-data.csv"}.merge(opts)
 		# Read all locations from file and store as array of arrays
 		@locations = CSV.read(opts[:location_file_path], :headers => true, :encoding => 'windows-1251:utf-8')
-		@id_for_sitelinks = opts[:id_for_sitelinks]
+		@total_created_seeds = 0
 	end
 
 	def createCampaignSitelinks(campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, sitelink_id)
@@ -476,7 +475,7 @@ class BingCampaignFactory < CampaignFactory
 	def createSitelink2(campaign, niche, seed, short_seed, sitelink_destination_url, sitelink_id)
 		sitelink_link_text_options = ["Quick " + seed + " Finder",
 							  		  seed + " Finder",
-							  		  "Quick" + short_seed + " Finder",
+							  		  "Quick " + short_seed + " Finder",
 							          niche + " Classes Finder",
 							      	  seed,
 							      	  short_seed + " Finder"]
@@ -569,12 +568,14 @@ class ModifiedBroadCityStateBingCampaignFactory < BingCampaignFactory
 		campaign_counter = 1
 		if @locations.length > BingCampaign::MAX_ADGROUPS_PER_CAMPAIGN
 			new_campaign.name =  base_campaign_name + " Group " + campaign_counter.to_s
+			@total_created_seeds += 1
+			new_campaign.id_for_sitelinks = @total_created_seeds
 		end
 
 		campaigns << new_campaign 
 
 		current_campaign = campaigns.last
-		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, @id_for_sitelinks + campaign_counter)
+		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, current_campaign.id_for_sitelinks)
 
 
 		@locations.each_with_index do |row, index|
@@ -616,9 +617,11 @@ class ModifiedBroadCityStateBingCampaignFactory < BingCampaignFactory
 			ad_group_count = index + 1
 			if ad_group_count % BingCampaign::MAX_ADGROUPS_PER_CAMPAIGN == 0
 				campaign_counter += 1
-				campaigns << BingCampaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
+				new_campaign = BingCampaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
+				new_campaign.id_for_sitelinks = @total_created_seeds
+				campaigns << new_campaign
 				current_campaign = campaigns.last
-				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, @id_for_sitelinks + campaign_counter)
+				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, current_campaign.id_for_sitelinks)
 			end
 		end
 		return campaigns
@@ -699,12 +702,14 @@ class ModifiedBroadCityBingCampaignFactory < BingCampaignFactory
 		campaign_counter = 1
 		if @locations.length > BingCampaign::MAX_ADGROUPS_PER_CAMPAIGN
 			new_campaign.name =  base_campaign_name + " Group " + campaign_counter.to_s
+			@total_created_seeds += 1
+			new_campaign.id_for_sitelinks = @total_created_seeds + 100000000 # Offset the id_for_sitelinks by 100000000 for City Campaigns
 		end
 
 		campaigns << new_campaign 
 
 		current_campaign = campaigns.last
-		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, @id_for_sitelinks + campaign_counter)
+		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, current_campaign.id_for_sitelinks)
 
 
 		@locations.each_with_index do |row, index|
@@ -741,9 +746,11 @@ class ModifiedBroadCityBingCampaignFactory < BingCampaignFactory
 			ad_group_count = index + 1
 			if ad_group_count % BingCampaign::MAX_ADGROUPS_PER_CAMPAIGN == 0
 				campaign_counter += 1
-				campaigns << BingCampaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
+				new_campaign = BingCampaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
+				new_campaign.id_for_sitelinks = @total_created_seeds + 100000000 # Offset the id_for_sitelinks by 100000000 for City Campaigns 
+				campaigns << new_campaign
 				current_campaign = campaigns.last
-				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, @id_for_sitelinks + campaign_counter)
+				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, current_campaign.id_for_sitelinks)
 			end
 		end
 		return campaigns
@@ -999,7 +1006,7 @@ class Campaign
 end
 
 class BingCampaign
-	attr_accessor :output_row_headers, :name
+	attr_accessor :output_row_headers, :name, :id_for_sitelinks
 	MAX_ADGROUPS_PER_CAMPAIGN = 20000
 	TYPE_STRING = "Campaign"
 
@@ -1011,7 +1018,8 @@ class BingCampaign
 				computers_bid_adjustment: 0,
 				status: "Active",
 				sitelinks: [],
-				adgroups: [] }.merge(opts)
+				adgroups: [],
+				id_for_sitelinks: 0 }.merge(opts)
 
 		@name = opts[:name]
 		@budget = opts[:budget]
@@ -1021,6 +1029,7 @@ class BingCampaign
 		@mobile_bid_adjustment = opts[:mobile_bid_adjustment] 
 		@tablet_bid_adjustment = opts[:tablet_bid_adjustment]
 		@computers_bid_adjustment = opts[:computers_bid_adjustment]
+		@id_for_sitelinks = opts[:id_for_sitelinks]
 
 		@output_row_headers = [ "Type",
 								"ID",
@@ -1771,6 +1780,12 @@ bingCampaigns = []
 seeds_file_path = "seeds-for-next-import.csv"
 seeds = CSV.read(seeds_file_path, :headers => true, :encoding => 'windows-1251:utf-8')
 
+cityStateCampaignFactory = ModifiedBroadCityStateAdWordsCampaignFactory.new(location_file_path: "city-state-location-data.csv")
+cityCampaignFactory = ModifiedBroadCityAdWordsCampaignFactory.new(location_file_path: "city-location-data.csv")
+cityBingStateCampaignFactory = ModifiedBroadCityStateBingCampaignFactory.new(location_file_path: "city-state-location-data.csv")
+cityBingCampaignFactory = ModifiedBroadCityBingCampaignFactory.new(location_file_path: "city-location-data.csv")
+
+
 seeds.each_with_index do |seed_data, index|
 	seed = seed_data["Seed"]
 	short_seed = seed_data["Short Seed"]
@@ -1803,32 +1818,25 @@ seeds.each_with_index do |seed_data, index|
 		createBingCity = true
 	end
 
-
 	# Create Campaign Factory to help with campaign creation
 	if createCityState
-		cityStateCampaignFactory = ModifiedBroadCityStateAdWordsCampaignFactory.new(location_file_path: "city-state-location-data.csv")
 		adwordsCampaigns.concat( cityStateCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
 		puts seed + " Adwords City/State Campaign Created"
 	end
 
 	if createCity
-		cityCampaignFactory = ModifiedBroadCityAdWordsCampaignFactory.new(location_file_path: "city-location-data.csv")
 		adwordsCampaigns.concat( cityCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
 		puts seed + " Adwords City Campaign Created"
 	end
 
 	# Create Campaign Factory to help with campaign creation
 	if createBingCityState
-		cityStateCampaignFactory = ModifiedBroadCityStateBingCampaignFactory.new(location_file_path: "city-state-location-data.csv",
-																				 id_for_sitelinks: index)
-		bingCampaigns.concat( cityStateCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
+		bingCampaigns.concat( cityBingStateCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
 		puts seed + " Bing City/State Campaign Created"
 	end
 
 	if createBingCity
-		cityCampaignFactory = ModifiedBroadCityBingCampaignFactory.new(location_file_path: "city-location-data.csv",
-																	   id_for_sitelinks: 1000000000 + index)
-		bingCampaigns.concat( cityCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
+		bingCampaigns.concat( cityBingCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
 		puts seed + " Bing City Campaign Created"
 	end
 end
