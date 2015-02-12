@@ -564,7 +564,10 @@ class ModifiedBroadCityStateBingCampaignFactory < BingCampaignFactory
 		base_campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION +LOCATIONCODE} (search; modbroad)"
 
 		campaigns = Array[]
-		new_campaign = BingCampaign.new( name: base_campaign_name)
+		new_campaign = BingCampaign.new( name: base_campaign_name )
+		new_campaign.mobile_bid_adjustment = -100
+		new_campaign.tablet_bid_adjustment = -100
+
 		campaign_counter = 1
 		if @locations.length > BingCampaign::MAX_ADGROUPS_PER_CAMPAIGN
 			new_campaign.name =  base_campaign_name + " Group " + campaign_counter.to_s
@@ -618,7 +621,10 @@ class ModifiedBroadCityStateBingCampaignFactory < BingCampaignFactory
 			if ad_group_count % BingCampaign::MAX_ADGROUPS_PER_CAMPAIGN == 0
 				campaign_counter += 1
 				new_campaign = BingCampaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
+				new_campaign.mobile_bid_adjustment = -100
+				new_campaign.tablet_bid_adjustment = -100
 				new_campaign.id_for_sitelinks = @total_created_seeds
+				
 				campaigns << new_campaign
 				current_campaign = campaigns.last
 				createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, current_campaign.id_for_sitelinks)
@@ -699,6 +705,9 @@ class ModifiedBroadCityBingCampaignFactory < BingCampaignFactory
 
 		campaigns = Array[]
 		new_campaign = BingCampaign.new( name: base_campaign_name)
+		new_campaign.mobile_bid_adjustment = -100
+		new_campaign.tablet_bid_adjustment = -100
+
 		campaign_counter = 1
 		if @locations.length > BingCampaign::MAX_ADGROUPS_PER_CAMPAIGN
 			new_campaign.name =  base_campaign_name + " Group " + campaign_counter.to_s
@@ -747,6 +756,9 @@ class ModifiedBroadCityBingCampaignFactory < BingCampaignFactory
 			if ad_group_count % BingCampaign::MAX_ADGROUPS_PER_CAMPAIGN == 0
 				campaign_counter += 1
 				new_campaign = BingCampaign.new( name: base_campaign_name + " Group " + campaign_counter.to_s )
+				new_campaign.mobile_bid_adjustment = -100
+				new_campaign.tablet_bid_adjustment = -100
+				
 				new_campaign.id_for_sitelinks = @total_created_seeds + 100000000 # Offset the id_for_sitelinks by 100000000 for City Campaigns 
 				campaigns << new_campaign
 				current_campaign = campaigns.last
@@ -1006,7 +1018,7 @@ class Campaign
 end
 
 class BingCampaign
-	attr_accessor :output_row_headers, :name, :id_for_sitelinks
+	attr_accessor :output_row_headers, :name, :id_for_sitelinks, :mobile_bid_adjustment, :tablet_bid_adjustment
 	MAX_ADGROUPS_PER_CAMPAIGN = 20000
 	TYPE_STRING = "Campaign"
 
@@ -1547,7 +1559,7 @@ class Keyword
 	def initialize( opts={} )
 		opts = { campaign: nil,
 		 		 ad_group: nil,
-		 		 max_cpc: 0.50,
+		 		 max_cpc: 1.00,
 		 		 keyword: "",
 		 		 type: "Broad",
 		 		 device: "All",
@@ -1780,12 +1792,6 @@ bingCampaigns = []
 seeds_file_path = "seeds-for-next-import.csv"
 seeds = CSV.read(seeds_file_path, :headers => true, :encoding => 'windows-1251:utf-8')
 
-cityStateCampaignFactory = ModifiedBroadCityStateAdWordsCampaignFactory.new(location_file_path: "city-state-location-data.csv")
-cityCampaignFactory = ModifiedBroadCityAdWordsCampaignFactory.new(location_file_path: "city-location-data.csv")
-cityBingStateCampaignFactory = ModifiedBroadCityStateBingCampaignFactory.new(location_file_path: "city-state-location-data.csv")
-cityBingCampaignFactory = ModifiedBroadCityBingCampaignFactory.new(location_file_path: "city-location-data.csv")
-
-
 seeds.each_with_index do |seed_data, index|
 	seed = seed_data["Seed"]
 	short_seed = seed_data["Short Seed"]
@@ -1820,22 +1826,26 @@ seeds.each_with_index do |seed_data, index|
 
 	# Create Campaign Factory to help with campaign creation
 	if createCityState
+		cityStateCampaignFactory = ModifiedBroadCityStateAdWordsCampaignFactory.new(location_file_path: "city-state-location-data.csv")
 		adwordsCampaigns.concat( cityStateCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
 		puts seed + " Adwords City/State Campaign Created"
 	end
 
 	if createCity
+		cityCampaignFactory = ModifiedBroadCityAdWordsCampaignFactory.new(location_file_path: "city-location-data.csv")
 		adwordsCampaigns.concat( cityCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
 		puts seed + " Adwords City Campaign Created"
 	end
 
 	# Create Campaign Factory to help with campaign creation
 	if createBingCityState
+		cityBingStateCampaignFactory = ModifiedBroadCityStateBingCampaignFactory.new(location_file_path: "city-state-location-data.csv")
 		bingCampaigns.concat( cityBingStateCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
 		puts seed + " Bing City/State Campaign Created"
 	end
 
 	if createBingCity
+		cityBingCampaignFactory = ModifiedBroadCityBingCampaignFactory.new(location_file_path: "city-location-data.csv")
 		bingCampaigns.concat( cityBingCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration) )
 		puts seed + " Bing City Campaign Created"
 	end
@@ -1858,6 +1868,7 @@ bingCampaigns.each_with_index do |campaign, index|
 	puts "Finished writing CSV for " + campaign.name
 end
 
-
+say_string = "All Done!"
+`say "#{say_string}"`
 puts "Script Complete!"
 puts "Time elapsed: #{Time.now - start_time} seconds"
