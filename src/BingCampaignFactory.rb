@@ -1,3 +1,10 @@
+require './CampaignFactory.rb'
+require './BingCampaign.rb'
+require './BingSitelink.rb'
+require './BingAdGroup.rb'
+require './BingKeyword.rb'
+require './BingAd.rb'
+
 class BingCampaignFactory < CampaignFactory
 	def initialize(opts={})	
 		opts = {location_file_path: "location-data.csv"}.merge(opts)

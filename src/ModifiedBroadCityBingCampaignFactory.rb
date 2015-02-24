@@ -1,3 +1,5 @@
+require './BingCampaignFactory.rb'
+
 class ModifiedBroadCityBingCampaignFactory < BingCampaignFactory
 
 	def create(seed, short_seed, niche, landingPage, area_of_study, concentration)

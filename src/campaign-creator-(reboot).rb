@@ -11,22 +11,10 @@ start_time = Time.now
 puts "Starting Script..."
 
 require 'csv'
-require './AdWordsCampaignFactory.rb'
-require './BingCampaignFactory.rb'
 require './ModifiedBroadCityStateAdWordsCampaignFactory.rb'
 require './ModifiedBroadCityAdWordsCampaignFactory.rb'
 require './ModifiedBroadCityStateBingCampaignFactory.rb'
 require './ModifiedBroadCityBingCampaignFactory.rb'
-require './AdWordsCampaign.rb'
-require './AdWordsSitelink.rb'
-require './AdWordsAdGroup.rb'
-require './AdWordsKeyword.rb'
-require './AdWordsAd.rb'
-require './BingCampaign.rb'
-require './BingSitelink.rb'
-require './BingAdGroup.rb'
-require './BingKeyword.rb'
-require './BingAd.rb'
 
 # Create array to hold all the campaigns once generation is completed
 adwordsCampaigns = Array[]

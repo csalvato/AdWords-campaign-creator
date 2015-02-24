@@ -1,4 +1,10 @@
 require './CampaignFactory.rb'
+require './AdWordsCampaign.rb'
+require './AdWordsSitelink.rb'
+require './AdWordsAdGroup.rb'
+require './AdWordsKeyword.rb'
+require './AdWordsAd.rb'
+
 
 class AdWordsCampaignFactory < CampaignFactory
 

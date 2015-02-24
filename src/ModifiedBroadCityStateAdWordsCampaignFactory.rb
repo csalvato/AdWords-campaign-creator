@@ -1,3 +1,5 @@
+require './AdWordsCampaignFactory.rb'
+
 # Class representing a "Campaign Factory" that can make City/State Campaigns
 class ModifiedBroadCityStateAdWordsCampaignFactory < AdWordsCampaignFactory
 	def initialize(opts={})	
