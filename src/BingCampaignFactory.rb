@@ -6,12 +6,6 @@ require './BingKeyword.rb'
 require './BingAd.rb'
 
 class BingCampaignFactory < CampaignFactory
-	def initialize(opts={})	
-		opts = {location_file_path: "location-data.csv"}.merge(opts)
-		# Read all locations from file and store as array of arrays
-		@locations = CSV.read(opts[:location_file_path], :headers => true, :encoding => 'windows-1251:utf-8')
-		@total_created_seeds = 0
-	end
 
 	def createCampaignSitelinks(campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, sitelink_id)
 		sitelink_page_headline = "Looking for " + seed + "?"
