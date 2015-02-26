@@ -15,6 +15,8 @@ class LocalExactBingCampaignFactory < BingCampaignFactory
 		current_campaign = BingCampaign.new( name: base_campaign_name,
 																		 location: @location_data[:code],
 																		 location_id: @location_data[:id] )
+		current_campaign.mobile_bid_adjustment = -100
+		current_campaign.tablet_bid_adjustment = -100
 
 		# Huge random number to mitigate collisions (but not completely ensure there are none)
 		current_campaign.id_for_sitelinks = Random.new.rand(1..9999999999999999999999)
