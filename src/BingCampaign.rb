@@ -25,8 +25,8 @@ class BingCampaign
 		@tablet_bid_adjustment = opts[:tablet_bid_adjustment]
 		@computers_bid_adjustment = opts[:computers_bid_adjustment]
 		@id_for_sitelinks = opts[:id_for_sitelinks]
-		@location = "United States"
-		@location_id = "190"
+		@location = opts[:location]
+		@location_id = opts[:location_id]
 
 		@output_row_headers = [ "Type",
 								"ID",
@@ -223,6 +223,7 @@ def self.location_data(location_code)
 										}
 
 		location_data[location_code]
+	end
 
 	# Set first to true if it is the first campaign in a set of campaigns that need to be in the same file.
 	def outputCampaign(output_filename, first)

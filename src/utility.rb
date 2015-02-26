@@ -1,5 +1,6 @@
 require 'csv'
 require './LocalExactAdWordsCampaignFactory.rb'
+require './LocalExactBingCampaignFactory.rb'
 
 
 seeds_file_path = "../seeds-for-next-import.csv"
@@ -22,7 +23,7 @@ seeds.each_with_index do |seed_data, index|
 	puts seed + " Adwords Exact Match VA Campaign Created"
 
 	exactBingCampaignFactory = LocalExactBingCampaignFactory.new(location_code: "VA")
-	adwordsCampaigns << exactBingCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration)
+	bingCampaigns << exactBingCampaignFactory.create(seed, short_seed, niche, landingPage, areaOfStudy, concentration)
 	puts seed + " Bing Exact Match VA Campaign Created"
 
 	#Output the campaigns as a CSV

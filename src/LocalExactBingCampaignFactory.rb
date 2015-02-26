@@ -13,9 +13,13 @@ class LocalExactBingCampaignFactory < BingCampaignFactory
 		base_campaign_name = "IP=#{@location_data[:code]} [#{niche}] [[#{@location_data[:code]}]] {#{seed}} (search; exact)"
 
 		current_campaign = BingCampaign.new( name: base_campaign_name,
-																		 location: @location_data[:name],
+																		 location: @location_data[:code],
 																		 location_id: @location_data[:id] )
-		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration)
+
+		# Huge random number to mitigate collisions (but not completely ensure there are none)
+		current_campaign.id_for_sitelinks = Random.new.rand(1..9999999999999999999999)
+
+		createCampaignSitelinks(current_campaign, niche, seed, short_seed, landingPage, area_of_study, concentration, current_campaign.id_for_sitelinks)
 
 		page_headline = "Looking for " + seed + " in " + @location_data[:code] + "?"		
 		ad_group_name = seed + " in " + @location_data[:name]
@@ -35,11 +39,10 @@ class LocalExactBingCampaignFactory < BingCampaignFactory
 						  "&utm_source=Google" + 
 						  "&utm_medium=cpc"
 		headline_options = createHeadlineOptions( niche, seed, short_seed )
-		desc_line_1_options = createDescLine1Options( niche, seed, short_seed )
-		desc_line_2_options = createDescLine2Options( niche, seed, short_seed )
+		text_options = createTextOptions( niche, seed, short_seed )
 		display_url_options = createDisplayURLOptions( niche, seed, short_seed )
 		device_preference = "All"
-		createAd(adgroup, headline_options, desc_line_1_options, desc_line_2_options, display_url_options, destination_url, device_preference)
+		createAd(adgroup, headline_options, text_options, display_url_options, destination_url, device_preference)
 
 		return current_campaign
 	end
@@ -53,8 +56,8 @@ class LocalExactBingCampaignFactory < BingCampaignFactory
 		short_seed]
 	end
 
-	def createDescLine1Options( niche, seed, short_seed )
-		[@location_data[:name] + " " + seed + "?",
+	def createTextOptions( niche, seed, short_seed )
+		desc_line_1 = [@location_data[:name] + " " + seed + "?",
 		@location_data[:code] + " " + seed + "?",
 		@location_data[:name] + " " + short_seed + "?",
 		@location_data[:code] + " " + short_seed + "?",
@@ -62,10 +65,8 @@ class LocalExactBingCampaignFactory < BingCampaignFactory
 		short_seed + "?",
 		seed,
 		short_seed]
-	end
 
-	def createDescLine2Options( niche, seed, short_seed )
-		["Find " + @location_data[:name] + " " + seed,
+		desc_line_2 = ["Find " + @location_data[:name] + " " + seed,
 		"Find " + @location_data[:code] + " " + seed,
 		"Find " + seed,
 		seed,
@@ -73,6 +74,15 @@ class LocalExactBingCampaignFactory < BingCampaignFactory
 		"Find " + @location_data[:code] + " " + short_seed,
 		"Find " + short_seed,
 		short_seed]
+
+		options = []
+		desc_line_1.each do |line_1|
+			desc_line_2.each do |line_2|
+				options << line_1 + " " + line_2
+			end
+		end
+
+		options
 	end
 
 	def createDisplayURLOptions( niche, seed, short_seed )
