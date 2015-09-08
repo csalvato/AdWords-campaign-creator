@@ -11,8 +11,8 @@ start_time = Time.now
 puts "Starting Script..."
 
 require 'csv'
-require './ModifiedBroadCityStateAdWordsCampaignFactory.rb'
 require './ModifiedBroadCityAdWordsCampaignFactory.rb'
+require './ModifiedBroadCityStateAdWordsCampaignFactory.rb'
 require './ModifiedBroadCityStateBingCampaignFactory.rb'
 require './ModifiedBroadCityBingCampaignFactory.rb'
 

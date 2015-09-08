@@ -1,10 +1,15 @@
 require './BingCampaignFactory.rb'
 
 class ModifiedBroadCityBingCampaignFactory < BingCampaignFactory
+	def initialize(opts={})	
+		opts = {location_file_path: "location-data.csv"}.merge(opts)
+		# Read all locations from file and store as array of arrays
+		@locations = CSV.read(opts[:location_file_path], :headers => true, :encoding => 'windows-1251:utf-8')
+	end
 
 	def create(seed, short_seed, niche, landingPage, area_of_study, concentration)
 
-		base_campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION} (search; modbroad)"
+		base_campaign_name = "IP=US [#{niche}] [[VA]] {#{seed} +SUBLOCATION} (search; modbroad)"
 
 		campaigns = Array[]
 		new_campaign = BingCampaign.new( name: base_campaign_name)

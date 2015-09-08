@@ -10,7 +10,7 @@ class ModifiedBroadCityAdWordsCampaignFactory < AdWordsCampaignFactory
 
 	def create(seed, short_seed, niche, landingPage, area_of_study, concentration)
 
-		base_campaign_name = "IP=US [#{niche}] {#{seed} +SUBLOCATION} (search; modbroad)"
+		base_campaign_name = "IP=US [#{niche}] [[VA]] {#{seed} +SUBLOCATION} (search; modbroad)"
 
 		campaigns = Array[]
 		new_campaign = Campaign.new( name: base_campaign_name)
